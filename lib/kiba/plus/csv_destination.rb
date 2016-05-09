@@ -2,12 +2,16 @@ require 'csv'
 
 module Kiba::Plus
   class CsvDestination
-    def initialize
+    attr_reader :options
+
+    def initialize(options = {})
+      @options = options
+      @options.assert_valid_keys(:output_file)
       @csv = CSV.open(output_file, 'w', {col_sep: delimiter})
     end
 
     def output_file
-      '/tmp/plus.csv'
+      options.fetch(:output_file)
     end
 
     def delimiter

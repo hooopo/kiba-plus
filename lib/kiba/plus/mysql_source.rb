@@ -4,11 +4,17 @@ require 'uri'
 module Kiba
   module Plus
     class MysqlSource
-      attr_reader :full_load, :client, :connect_url
+      attr_reader :options, :client
 
-      def initialize(connect_url, full_load = true)
-        @full_load = full_load
-        @connect_url = connect_url
+      def initialize(options = {})
+        @options = options
+        @options.assert_valid_keys(
+          :query,
+          :output,
+          :last_pull_at,
+          :full_load,
+          :connect_url
+          )
         @client = Mysql2::Client.new(connect_hash(connect_url))
       end
 
@@ -20,17 +26,23 @@ module Kiba
       end
 
       def query
-        raise 'Not Imp!'
+        options.fetch(:query)
       end
 
       def output
-        [:id, :name]
+        options.fetch(:output)
       end
 
       def last_pull_at
+        options[:last_pull_at]
       end
 
-      def full_load?
+      def full_load
+        options[:full_load] || true
+      end
+
+      def connect_url
+        options.fetch(:connect_url)
       end
 
       private
