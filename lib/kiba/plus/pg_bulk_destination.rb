@@ -37,15 +37,15 @@ module Kiba::Plus
     end
 
     def truncate
-      options.fetch(:truncate) rescue false
+      options.fetch(:truncate, false)
     end
 
     def incremental
-      options.fetch(:incremental) rescue true
+      options.fetch(:incremental, true)
     end
 
     def unique_by
-      options[:unique_by] || [:id]
+      options.fetch(:unique_by, :id)
     end
 
     def write(row)

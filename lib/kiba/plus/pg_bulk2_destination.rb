@@ -48,11 +48,11 @@ module Kiba::Plus
     end
 
     def truncate
-      options[:truncate] || false
+      options.fetch(:truncate, false)
     end
 
-    def incremental?
-      options.fetch(:incremental)
+    def incremental
+      options.fetch(:incremental, true)
     end
 
     def close

@@ -37,7 +37,7 @@ module Kiba::Plus
     end
 
     def prepare_name
-      options[:prepare_name] || self.class.to_s.downcase + "stmt"
+      options.fetch(:prepare_name, self.class.to_s.downcase + "stmt")
     end
 
     def prepare_sql

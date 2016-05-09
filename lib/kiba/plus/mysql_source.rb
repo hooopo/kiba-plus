@@ -38,7 +38,7 @@ module Kiba
       end
 
       def full_load
-        options[:full_load] || true
+        options.fetch(:full_load, true)
       end
 
       def connect_url
