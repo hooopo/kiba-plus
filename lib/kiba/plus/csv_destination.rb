@@ -15,7 +15,7 @@ module Kiba::Plus
     end
 
     def delimiter
-      ', '
+      ','
     end
 
     def write(row)
