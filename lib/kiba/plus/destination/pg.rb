@@ -1,7 +1,7 @@
 require 'pg'
 
-module Kiba::Plus
-  class PgDestination
+module Kiba::Plus::Destination
+  class Pg
     attr_reader :options
 
     def initialize(options = {})
@@ -20,8 +20,8 @@ module Kiba::Plus
       @conn.exec_prepared(prepare_name,
         row.values_at(*columns))
     rescue PG::Error => ex
-      puts "ERROR for #{row}"
-      puts ex.message
+      Kiba::Plus.logger.error "ERROR for #{row}"
+      Kiba::Plus.logger.error ex.message
       # Maybe, write to db table or file
     end
 

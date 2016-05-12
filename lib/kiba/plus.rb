@@ -1,11 +1,13 @@
-require "kiba/plus/version"
+require_relative "plus/version"
 
-require "kiba/plus/mysql_source"
+require_relative "plus/source/mysql"
 
-require "kiba/plus/csv_destination"
-require "kiba/plus/pg_destination"
-require "kiba/plus/pg_bulk_destination"
-require "kiba/plus/pg_bulk2_destination"
+require_relative "plus/destination/csv"
+require_relative "plus/destination/pg"
+require_relative "plus/destination/pg_bulk"
+require_relative "plus/destination/pg_bulk2"
+
+require_relative 'plus/logger'
 
 module Kiba
   module Plus

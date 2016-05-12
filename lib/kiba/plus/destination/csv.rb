@@ -1,7 +1,7 @@
 require 'csv'
 
-module Kiba::Plus
-  class CsvDestination
+module Kiba::Plus::Destination
+  class Csv
     attr_reader :options
 
     def initialize(options = {})

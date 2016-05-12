@@ -1,7 +1,7 @@
 require 'pg'
 require 'csv'
-module Kiba::Plus
-  class PgBulk2Destination
+module Kiba::Plus::Destination
+  class PgBulk2
     attr_reader :options
 
     def initialize(options = {})
@@ -16,11 +16,11 @@ module Kiba::Plus
       @conn = PG.connect(connect_url)
       truncate_sql = "TRUNCATE TABLE #{table_name};"
       if truncate
-        puts truncate_sql
+        Kiba::Plus.logger.info truncate_sql
         @conn.exec(truncate_sql)
       end
       sql = "COPY #{table_name} (#{columns.join(', ')}) FROM STDIN WITH DELIMITER ',' NULL '\\N' CSV"
-      puts sql
+      Kiba::Plus.logger.info sql
       @res  = @conn.exec(sql)
     end
 
@@ -38,7 +38,7 @@ module Kiba::Plus
       rescue Exception => err
         errmsg = "%s while copy data: %s" % [ err.class.name, err.message ]
         @conn.put_copy_end( errmsg )
-        $stderr.puts @conn.get_result
+        Kiba::Plus.logger.error @conn.get_result
         raise
       end
     end

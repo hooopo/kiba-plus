@@ -2,8 +2,8 @@ require 'mysql2'
 require 'uri'
 
 module Kiba
-  module Plus
-    class MysqlSource
+  module Plus::Source
+    class Mysql
       attr_reader :options, :client
 
       def initialize(options = {})
