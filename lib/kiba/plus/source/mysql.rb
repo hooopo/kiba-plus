@@ -4,6 +4,7 @@ require 'uri'
 module Kiba
   module Plus::Source
     class Mysql
+      include Kiba::Plus::Helper
       attr_reader :options, :client
 
       def initialize(options = {})
@@ -12,7 +13,7 @@ module Kiba
           :query,
           :output,
           :last_pull_at,
-          :full_load,
+          :incremental,
           :connect_url
           )
         @client = Mysql2::Client.new(connect_hash(connect_url))
@@ -37,25 +38,12 @@ module Kiba
         options[:last_pull_at]
       end
 
-      def full_load
-        options.fetch(:full_load, true)
+      def incremental
+        options.fetch(:incremental, true)
       end
 
       def connect_url
         options.fetch(:connect_url)
-      end
-
-      private
-
-      def connect_hash(url)
-        u = URI.parse(url)
-        {
-          host: u.host,
-          username: u.user,
-          password: u.password,
-          port: u.port,
-          database: u.path[1..-1]
-        }
       end
     end
   end
