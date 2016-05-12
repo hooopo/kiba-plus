@@ -88,7 +88,7 @@ module Kiba::Plus
 
     # TODO add where condition to speed up deleting.
     def delete_before_insert
-      where = unique_by.to_a.map{|x| ["#{staging_table_name}.#{x}", "#{table_name}.#{x}"].join(" = ") }.join(" AND ")
+      where = Array(unique_by).map{|x| ["#{staging_table_name}.#{x}", "#{table_name}.#{x}"].join(" = ") }.join(" AND ")
       sql = "DELETE FROM #{table_name} USING #{staging_table_name} WHERE #{where}"
       puts sql
       @conn.exec(sql)
