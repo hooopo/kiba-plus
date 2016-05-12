@@ -1,5 +1,7 @@
 require_relative "plus/version"
 
+require_relative "plus/helper"
+
 require_relative "plus/source/mysql"
 
 require_relative "plus/destination/csv"
@@ -8,6 +10,7 @@ require_relative "plus/destination/pg_bulk"
 require_relative "plus/destination/pg_bulk2"
 
 require_relative 'plus/logger'
+require_relative "plus/job"
 
 module Kiba
   module Plus
