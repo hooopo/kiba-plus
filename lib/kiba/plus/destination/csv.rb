@@ -15,7 +15,7 @@ module Kiba::Plus::Destination
     end
 
     def delimiter
-      ','
+      ","
     end
 
     def write(row)
