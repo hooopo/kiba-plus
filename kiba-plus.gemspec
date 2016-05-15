@@ -26,7 +26,9 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.add_runtime_dependency "kiba"
+  spec.add_runtime_dependency "kiba", "~> 0.6"
+  spec.add_runtime_dependency "mysql2", "~> 0.4"
+  spec.add_runtime_dependency "pg", "~> 0.18"
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "minitest", "~> 5.0"
