@@ -1,0 +1,23 @@
+PATH
+  remote: ../
+  specs:
+    kiba-plus (0.1.0)
+      kiba (~> 0.6)
+      mysql2 (~> 0.4)
+      pg (~> 0.18)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    kiba (0.6.1)
+    mysql2 (0.4.4)
+    pg (0.18.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  kiba-plus!
+
+BUNDLED WITH
+   1.11.2
