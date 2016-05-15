@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+require_relative 'init'
+
+SOURCE_URL = 'mysql://root@localhost/shopperplus'
+
+source Kiba::Plus::Source::Mysql, :connect_url => SOURCE_URL,
+                           :query => %Q{SELECT id, email, 'hooopo' AS first_name, 'Wang' AS last_name FROM customers}
+
+destination Kiba::Plus::Destination::Csv, :output_file => "/tmp/customer_csv.csv"
+
+post_process do
+  puts %x{head -n 10 /tmp/customer_csv.csv}
+end
