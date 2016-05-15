@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+require_relative 'init'
+
+SOURCE_URL = 'mysql://root@localhost/shopperplus'
+
+DEST_URL   = 'postgresql://hooopo@localhost:5432/crm2_dev'
+
+source Kiba::Plus::Source::Mysql, { :connect_url => SOURCE_URL,
+                           :query => %Q{SELECT id, email, 'hooopo' AS first_name, 'Wang' AS last_name FROM customers}
+                         }
+
+destination Kiba::Plus::Destination::PgBulk2, { :connect_url => DEST_URL,
+                                :table_name => "customers",
+                                :truncate => true,
+                                :columns => [:id, :email, :first_name, :last_name],
+                                :incremental => false
+                              }
+
+post_process do
+  result = PG.connect(DEST_URL).query("SELECT COUNT(*) AS num FROM customers")
+  puts "Insert total: #{result.first['num']}"
+end
+
+# Output:
+# I, [2016-05-16T01:53:36.832565 #87909]  INFO -- : TRUNCATE TABLE customers;
+# I, [2016-05-16T01:53:36.841770 #87909]  INFO -- : COPY customers (id, email, first_name, last_name) FROM STDIN WITH DELIMITER ',' NULL '\N' CSV
+# Insert total: 428972
