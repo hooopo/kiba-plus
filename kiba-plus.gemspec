@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Hooopo"]
   spec.email         = ["hoooopo@gmail.com"]
 
-  spec.summary       = %q{kiba plus}
-  spec.description   = %q{kiba plus}
-  spec.homepage      = ""
+  spec.summary       = %q{Kiba enhancement for Ruby ETL}
+  spec.description   = %q{It connects to various data sources including relational, non-relational, and flat file, cloud services and HTTP resources. It has flexible load strategies including insert, bulk load and upsert.}
+  spec.homepage      = "https://github.com/hooopo/kiba-plus"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
