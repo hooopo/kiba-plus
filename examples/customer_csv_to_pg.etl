@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+require_relative 'init'
+
+DEST_URL   = 'postgresql://hooopo@localhost:5432/crm2_dev'
+
+destination Kiba::Plus::Destination::PgBulk, { :connect_url => DEST_URL,
+                                :table_name => "customers",
+                                :input_file => File.expand_path(File.dirname(__FILE__) + "/data/customer.csv"),
+                                :truncate => true,
+                                :columns => [:id, :email, :first_name, :last_name],
+                                :incremental => false
+                              }
+post_process do
+  result = PG.connect(DEST_URL).query("SELECT COUNT(*) AS num FROM customers")
+  puts "Insert total: #{result.first['num']}"
+end
