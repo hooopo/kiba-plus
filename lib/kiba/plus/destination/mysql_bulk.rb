@@ -12,7 +12,10 @@ module Kiba::Plus::Destination
                                  :input_file,
                                  :connect_url,
                                  :truncate,
-                                 :incremental
+                                 :incremental,
+                                 :delimited_by,
+                                 :enclosed_by,
+                                 :ignore_lines
                                  )
 
       @client = Mysql2::Client.new(connect_hash(connect_url).merge(local_infile: true))
@@ -24,6 +27,18 @@ module Kiba::Plus::Destination
 
     def table_name
       options.fetch(:table_name)
+    end
+
+    def delimited_by
+      options.fetch(:delimited_by, ",")
+    end
+
+    def enclosed_by
+      options.fetch(:enclosed_by, '"')
+    end
+
+    def ignore_lines
+      options.fetch(:ignore_lines, 0)
     end
 
     def write(row)
@@ -52,7 +67,15 @@ module Kiba::Plus::Destination
         @client.query(truncate_sql)
       end
 
-      bulk_sql = "LOAD DATA LOCAL INFILE '#{input_file}' REPLACE INTO TABLE #{table_name} FIELDS TERMINATED BY ', ' (#{columns.join(',')})"
+      bulk_sql = <<-SQL
+        LOAD DATA LOCAL INFILE '#{input_file}'
+          REPLACE INTO TABLE #{table_name}
+          FIELDS
+          TERMINATED BY '#{delimited_by}'
+          ENCLOSED BY '#{enclosed_by}'
+          IGNORE #{ignore_lines} LINES
+          (#{columns.join(',')})
+      SQL
       Kiba::Plus.logger.info bulk_sql
       @client.query(bulk_sql)
 

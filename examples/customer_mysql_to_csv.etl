@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require_relative 'init'
 
-SOURCE_URL = 'mysql://root@localhost/shopperplus'
+DEST_URL = 'mysql://root@localhost/crm2_dev'
 
 source Kiba::Plus::Source::Mysql, :connect_url => SOURCE_URL,
                            :query => %Q{SELECT id, email, 'hooopo' AS first_name, 'Wang' AS last_name FROM customers}

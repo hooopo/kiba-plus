@@ -1,5 +1,7 @@
 Bundler.require(:default)
 
+include Kiba::Plus::Helper
+
 source_files = File.expand_path(File.dirname(__FILE__) + "/sources/*.rb")
 destination_files = File.expand_path(File.dirname(__FILE__) + "/destinations/*.rb")
 
