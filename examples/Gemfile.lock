@@ -1,7 +1,7 @@
 PATH
   remote: ../
   specs:
-    kiba-plus (0.1.0)
+    kiba-plus (0.1.1)
       kiba (~> 0.6)
       mysql2 (~> 0.4)
       pg (~> 0.18)

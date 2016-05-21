@@ -1,7 +1,9 @@
 require 'pg'
 require 'csv'
+require_relative 'pg_bulk_utils'
 module Kiba::Plus::Destination
   class PgBulk2
+    include PgBulkUtils
     attr_reader :options
 
     def initialize(options = {})
@@ -10,16 +12,22 @@ module Kiba::Plus::Destination
                                  :columns,
                                  :connect_url,
                                  :truncate,
-                                 :incremental
+                                 :incremental,
+                                 :unique_by
                                  )
 
       @conn = PG.connect(connect_url)
-      truncate_sql = "TRUNCATE TABLE #{table_name};"
       if truncate
-        Kiba::Plus.logger.info truncate_sql
-        @conn.exec(truncate_sql)
+        truncate_staging_table
+        truncate_target_table
       end
-      sql = "COPY #{table_name} (#{columns.join(', ')}) FROM STDIN WITH DELIMITER ',' NULL '\\N' CSV"
+      if incremental
+        truncate_staging_table
+        create_staging_table
+        sql = "COPY #{staging_table_name} (#{columns.join(', ')}) FROM STDIN WITH DELIMITER ',' NULL '\\N' CSV"
+      else
+        sql = "COPY #{table_name} (#{columns.join(', ')}) FROM STDIN WITH DELIMITER ',' NULL '\\N' CSV"
+      end
       Kiba::Plus.logger.info sql
       @res  = @conn.exec(sql)
     end
@@ -55,9 +63,18 @@ module Kiba::Plus::Destination
       options.fetch(:incremental, true)
     end
 
+    def unique_by
+      options.fetch(:unique_by, :id)
+    end
+
     def close
       @conn.put_copy_end
       @conn.get_last_result
+      if incremental
+        delete_before_insert
+        merge_to_target_table
+        truncate_staging_table
+      end
     rescue
       raise
     ensure
