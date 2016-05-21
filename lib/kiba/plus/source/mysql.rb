@@ -20,6 +20,7 @@ module Kiba
       end
 
       def each
+        Kiba::Plus.logger.info query
         results = client.query(query, as: :hash, symbolize_keys: true, stream: true)
         results.each do |row|
           yield(row)
