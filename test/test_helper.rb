@@ -9,6 +9,7 @@ require 'pry'
 
 require 'fileutils'
 require 'tempfile'
+require 'csv'
 
 require 'minitest/autorun'
 
@@ -50,15 +51,15 @@ module Minitest::MyPlugin
     @@database_cleaners.each(&:clean)
   end
 
-  def run_etl(etl_content)
-    etl_file = make_etl_file etl_content
-
-    Kiba.run Kiba.parse(etl_content, etl_file)
-
-    FileUtils.rm_rf etl_file
-  end
-
   private
+
+  def run_etl_content(etl_content)
+    etl_path = make_etl_file etl_content
+
+    Kiba.run Kiba.parse(etl_content, etl_path)
+
+    FileUtils.rm_rf etl_path
+  end
 
   def make_etl_file(etl_content)
     FileUtils.mkdir_p etl_tmpdir
@@ -68,8 +69,19 @@ module Minitest::MyPlugin
     file.path
   end
 
+  def make_csv_file
+    FileUtils.mkdir_p csv_tmpdir
+
+    file = Tempfile.new ['csv', '.csv'], csv_tmpdir
+    file.path
+  end
+
   def etl_tmpdir
     File.join(Dir.tmpdir, 'etl')
+  end
+
+  def csv_tmpdir
+    File.join(Dir.tmpdir, 'csv')
   end
 
 end
