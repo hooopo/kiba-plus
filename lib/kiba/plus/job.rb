@@ -15,7 +15,7 @@ module Kiba
         @options.assert_valid_keys(:connect_url, :job_id, :job_name, :start_at, :completed_at)
         url = URI.parse(connect_url)
         if url.scheme =~ /mysql/i
-          @client = Mysql2::Client.new(connect_hash(connect_url))
+          @client = Mysql2::Client.new(mysql2_connect_hash(connect_url))
         elsif url.scheme =~ /postgres/i
           @client = PG.connect(connect_url)
         else

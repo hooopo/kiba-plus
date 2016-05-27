@@ -2,7 +2,7 @@ require 'uri'
 module Kiba
   module Plus
     module Helper
-      def connect_hash(url)
+      def mysql2_connect_hash(url)
         u = URI.parse(url)
         {
           host: u.host,
