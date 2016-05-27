@@ -17,7 +17,6 @@ class Kiba::Features::CsvToXTest < Minitest::Test
     # default mode is 0600
     FileUtils.chmod 0666, src_csv_path
     CSV.open(src_csv_path, "wb") do |csv|
-      csv << %w(id email first_name last_name)
       1.upto(10).each do |n|
         csv << [n, "user#{n}@example.com", "first_name#{n}", "last_name#{n}"]
       end
@@ -66,6 +65,13 @@ end
   def test_to_pg_with_examples_customer_csv_to_pg
     build
 
+    #
+    # Because csv file should not in /tmp dir
+    #
+    pgg_copy_from_tmp_dir = File.expand_path('../../../pgg_copy_from_tmp', __FILE__)
+    src_csv_path_with_pg = File.join pgg_copy_from_tmp_dir, File.basename(src_csv_path)
+    FileUtils.cp src_csv_path, src_csv_path_with_pg
+
     etl_content = %Q^
 require 'kiba/plus'
 
@@ -73,7 +79,7 @@ DEST_URL   = '#{dest_pg_url}'
 
 destination Kiba::Plus::Destination::PgBulk, { :connect_url => DEST_URL,
                                 :table_name => "customers",
-                                :input_file => '#{src_csv_path}',
+                                :input_file => '#{src_csv_path_with_pg}',
                                 :truncate => true,
                                 :columns => [:id, :email, :first_name, :last_name],
                                 :incremental => false
@@ -83,6 +89,8 @@ post_process do
 end
 ^
     run_etl_content etl_content
+
+    FileUtils.rm_rf src_csv_path_with_pg
 
     assert_equal 10, dest_pg_db[:customers].count
     assert_equal 'user10@example.com', dest_pg_db[:customers].order(:id).last[:email]
