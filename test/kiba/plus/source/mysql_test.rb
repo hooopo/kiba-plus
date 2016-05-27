@@ -8,7 +8,7 @@ class Kiba::Plus::Source::MysqlTest < Minitest::Test
       output: nil,
       last_pull_at: nil,
       incremental: nil,
-      connect_url: @@mysql2_src_connect_url
+      connect_url: @@connect_urls[:mysql2_src]
     }
 
     obj = Kiba::Plus::Source::Mysql.new(options)
