@@ -12,7 +12,7 @@ module Kiba::Plus::Destination
         :prepare_sql,
         :columns
       )
-      @client = Mysql2::Client.new(connect_hash(connect_url))
+      @client = Mysql2::Client.new(mysql2_connect_hash(connect_url))
       @pre_stmt = @client.prepare(prepare_sql)
     end
 

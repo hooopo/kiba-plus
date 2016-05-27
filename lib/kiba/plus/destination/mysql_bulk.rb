@@ -18,7 +18,7 @@ module Kiba::Plus::Destination
                                  :ignore_lines
                                  )
 
-      @client = Mysql2::Client.new(connect_hash(connect_url).merge(local_infile: true))
+      @client = Mysql2::Client.new(mysql2_connect_hash(connect_url).merge(local_infile: true))
     end
 
     def connect_url

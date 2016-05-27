@@ -16,7 +16,7 @@ module Kiba
           :incremental,
           :connect_url
           )
-        @client = Mysql2::Client.new(connect_hash(connect_url))
+        @client = Mysql2::Client.new(mysql2_connect_hash(connect_url))
       end
 
       def each

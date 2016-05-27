@@ -11,6 +11,6 @@ destination Kiba::Plus::Destination::MysqlBulk, { :connect_url => DEST_URL,
                                 :incremental => false
                               }
 post_process do
-  result = Mysql2::Client.new(connect_hash(DEST_URL)).query("SELECT COUNT(*) AS num FROM customers")
+  result = Mysql2::Client.new(mysql2_connect_hash(DEST_URL)).query("SELECT COUNT(*) AS num FROM customers")
   puts "Insert total: #{result.first['num']}"
 end
