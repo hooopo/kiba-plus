@@ -43,5 +43,5 @@ build/
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 
-/test/pgg_copy_from_tmp/*
-!/test/pgg_copy_from_tmp/.keep
+/test/pg_copy_tmp/*
+!/test/pg_copy_tmp/.keep

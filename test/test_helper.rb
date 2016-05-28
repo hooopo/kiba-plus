@@ -57,8 +57,6 @@ module Minitest::MyPlugin
     etl_path = make_etl_file etl_content
 
     Kiba.run Kiba.parse(etl_content, etl_path)
-
-    FileUtils.rm_rf etl_path
   end
 
   def make_etl_file(etl_content)

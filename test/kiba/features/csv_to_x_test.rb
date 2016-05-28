@@ -68,8 +68,8 @@ end
     #
     # Because csv file should not in /tmp dir
     #
-    pgg_copy_from_tmp_dir = File.expand_path('../../../pgg_copy_from_tmp', __FILE__)
-    src_csv_path_with_pg = File.join pgg_copy_from_tmp_dir, File.basename(src_csv_path)
+    pg_copy_tmp_dir = File.expand_path('../../../pg_copy_tmp', __FILE__)
+    src_csv_path_with_pg = File.join pg_copy_tmp_dir, File.basename(src_csv_path)
     FileUtils.cp src_csv_path, src_csv_path_with_pg
 
     etl_content = %Q^
