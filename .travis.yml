@@ -1,4 +1,25 @@
 language: ruby
+
 rvm:
   - 2.2.4
-before_install: gem install bundler -v 1.11.2
+
+services:
+  - mysql
+  - postgresql
+
+env:
+  - MYSQL2_SRC_CONNECT_URL=mysql2://travis@localhost/kiba_plus_src_test
+  - MYSQL2_DEST_CONNECT_URL=mysql2://travis@localhost/kiba_plus_dest_test
+  - PG_SRC_CONNECT_URL=postgresql://postgres@localhost/kiba_plus_src_test
+  - PG_DEST_CONNECT_URL=postgresql://postgres@localhost/kiba_plus_dest_test
+
+before_install:
+  - gem install bundler -v 1.11.2
+
+before_script:
+  - mysql -e 'create database kiba_plus_src_test;'
+  - mysql -e 'create database kiba_plus_dest_test;'
+  - psql -c 'create database kiba_plus_src_test;' -U postgres
+  - psql -c 'create database kiba_plus_dest_test;' -U postgres
+
+script: bundle exec rake test

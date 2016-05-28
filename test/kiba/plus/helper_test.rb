@@ -4,7 +4,7 @@ class Kiba::Plus::HelperTest < Minitest::Test
 
   include Kiba::Plus::Helper
 
-  def test_mysql2_connect_hash_with_default_mysql2_connect_url
+  def test_mysql2_connect_hash_with_simple_mysql2_connect_url
     expected = {
       host: 'localhost',
       username: 'root',
@@ -13,7 +13,7 @@ class Kiba::Plus::HelperTest < Minitest::Test
       database: 'kiba_plus_test'
     }
 
-    url = @default_mysql2_connect_url
+    url = 'mysql://root@localhost/kiba_plus_test'
     result = mysql2_connect_hash(url)
 
     assert_equal expected, result
