@@ -3,12 +3,14 @@ module Kiba
   module Plus
     module Helper
       def mysql2_connect_hash(url)
+        return url if url.is_a?(Hash)
+
         u = URI.parse(url)
         {
           host: u.host,
+          port: u.port,
           username: u.user,
           password: u.password,
-          port: u.port,
           database: u.path[1..-1]
         }
       end
