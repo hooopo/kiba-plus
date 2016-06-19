@@ -4,6 +4,8 @@ Kiba enhancement for Ruby ETL. It connects to various data sources including rel
 # Usage
 
 ```ruby
+# /tmp/customer_mysql_to_pg.etl
+
 require 'kiba/plus'
 
 SOURCE_URL = 'mysql://root@localhost/shopperplus'
@@ -27,19 +29,24 @@ post_process do
 end
 ```
 
-Execute:
+Execute in shell:
 
 ```shell
-bundle exec kiba customer_mysql_to_pg.etl
-```
+$ bundle exec kiba /tmp/customer_mysql_to_pg.etl
 
-Output:
-
-```
 # Output:
 # I, [2016-05-16T01:53:36.832565 #87909]  INFO -- : TRUNCATE TABLE customers;
 # I, [2016-05-16T01:53:36.841770 #87909]  INFO -- : COPY customers (id, email, first_name, last_name) FROM STDIN WITH DELIMITER ',' NULL '\N' CSV
 # Insert total: 428972
+```
+
+Execute in ruby script:
+
+```ruby
+require 'kiba'
+
+job_definition = Kiba.parse(IO.read('/tmp/customer_mysql_to_pg.etl'), '/tmp/customer_mysql_to_pg.etl')
+Kiba.run(job_definition)
 ```
 
 # Examples
@@ -79,6 +86,7 @@ Output:
 Add this line to your application's Gemfile:
 
 ```ruby
+gem 'kiba'
 gem 'kiba-plus'
 ```
 
@@ -89,9 +97,6 @@ And then execute:
 Or install it yourself as:
 
     $ gem install kiba-plus
-
-## Usage
-
 
 ## Development
 
