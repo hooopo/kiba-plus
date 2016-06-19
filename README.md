@@ -29,15 +29,11 @@ post_process do
 end
 ```
 
-Execute:
+Execute in shell:
 
 ```shell
 $ bundle exec kiba /tmp/customer_mysql_to_pg.etl
-```
 
-Output:
-
-```
 # Output:
 # I, [2016-05-16T01:53:36.832565 #87909]  INFO -- : TRUNCATE TABLE customers;
 # I, [2016-05-16T01:53:36.841770 #87909]  INFO -- : COPY customers (id, email, first_name, last_name) FROM STDIN WITH DELIMITER ',' NULL '\N' CSV
