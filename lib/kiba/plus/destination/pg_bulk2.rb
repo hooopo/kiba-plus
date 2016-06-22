@@ -35,7 +35,7 @@ module Kiba::Plus::Destination
         sql = bulk_sql_with_non_incremental
       end
       Kiba::Plus.logger.info sql
-      @res  = @conn.exec(sql)
+      @res = @conn.exec(sql)
     end
 
     def connect_url
