@@ -13,7 +13,8 @@ module Kiba::Plus::Destination
        :columns,
        :truncate,
        :incremental,
-       :unique_by
+       :unique_by,
+       :ignore_input_file_header
        )
       @conn = PG.connect(connect_url)
       if truncate
@@ -50,14 +51,18 @@ module Kiba::Plus::Destination
       options.fetch(:unique_by, :id)
     end
 
+    def ignore_input_file_header
+      !!options.fetch(:ignore_input_file_header, false)
+    end
+
     def copy_to_target_table
-      sql = "COPY #{table_name} (#{columns.join(', ')}) FROM '#{File.expand_path(input_file)}' WITH DELIMITER ',' NULL '\\N' CSV"
+      sql = sql_with_copy_to_target_table
       Kiba::Plus.logger.info sql
       @conn.exec(sql)
     end
 
     def copy_to_staging_table
-      sql = "COPY #{staging_table_name} (#{columns.join(', ')}) FROM '#{File.expand_path(input_file)}' WITH DELIMITER ',' NULL '\\N' CSV"
+      sql = sql_with_copy_to_staging_table
       Kiba::Plus.logger.info sql
       @conn.exec(sql)
     end
@@ -80,5 +85,32 @@ module Kiba::Plus::Destination
       @conn.close
       @conn = nil
     end
+
+    private
+
+    def sql_with_copy_to_target_table
+      %Q^
+      COPY #{table_name} (#{columns.join(', ')})
+        FROM '#{File.expand_path(input_file)}'
+          WITH
+            #{ignore_input_file_header ? 'HEADER' : ''}
+            DELIMITER ','
+            NULL '\\N'
+            CSV
+      ^.gsub(/[\n][\s]*[\n]/, "\n")
+    end
+
+    def sql_with_copy_to_staging_table
+      %Q^
+      COPY #{staging_table_name} (#{columns.join(', ')})
+        FROM '#{File.expand_path(input_file)}'
+          WITH
+            #{ignore_input_file_header ? 'HEADER' : ''}
+            DELIMITER ','
+            NULL '\\N'
+            CSV
+      ^.gsub(/[\n][\s]*[\n]/, "\n")
+    end
+
   end
 end

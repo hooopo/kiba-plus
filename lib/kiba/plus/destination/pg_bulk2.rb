@@ -13,7 +13,8 @@ module Kiba::Plus::Destination
                                  :connect_url,
                                  :truncate,
                                  :incremental,
-                                 :unique_by
+                                 :unique_by,
+                                 :ignore_input_file_header
                                  )
 
       @conn = PG.connect(connect_url)
@@ -24,9 +25,9 @@ module Kiba::Plus::Destination
       if incremental
         truncate_staging_table
         create_staging_table
-        sql = "COPY #{staging_table_name} (#{columns.join(', ')}) FROM STDIN WITH DELIMITER ',' NULL '\\N' CSV"
+        sql = bulk_sql_with_incremental
       else
-        sql = "COPY #{table_name} (#{columns.join(', ')}) FROM STDIN WITH DELIMITER ',' NULL '\\N' CSV"
+        sql = bulk_sql_with_non_incremental
       end
       Kiba::Plus.logger.info sql
       @res  = @conn.exec(sql)
@@ -67,6 +68,10 @@ module Kiba::Plus::Destination
       options.fetch(:unique_by, :id)
     end
 
+    def ignore_input_file_header
+      !!options.fetch(:ignore_input_file_header, false)
+    end
+
     def close
       @conn.put_copy_end
       @conn.get_last_result
@@ -81,5 +86,32 @@ module Kiba::Plus::Destination
       @conn.close
       @conn = nil
     end
+
+    private
+
+    def bulk_sql_with_incremental
+      %Q^
+      COPY #{staging_table_name} (#{columns.join(', ')})
+        FROM STDIN
+          WITH
+            #{ignore_input_file_header ? 'HEADER' : ''}
+            DELIMITER ','
+            NULL '\\N'
+            CSV
+      ^.gsub(/[\n][\s]*[\n]/, "\n")
+    end
+
+    def bulk_sql_with_non_incremental
+      %Q^
+      COPY #{table_name} (#{columns.join(', ')})
+        FROM STDIN
+          WITH
+            #{ignore_input_file_header ? 'HEADER' : ''}
+            DELIMITER ','
+            NULL '\\N'
+            CSV
+      ^.gsub(/[\n][\s]*[\n]/, "\n")
+    end
+
   end
 end

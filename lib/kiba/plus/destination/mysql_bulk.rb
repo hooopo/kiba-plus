@@ -15,7 +15,8 @@ module Kiba::Plus::Destination
                                  :incremental,
                                  :delimited_by,
                                  :enclosed_by,
-                                 :ignore_lines
+                                 :ignore_lines,
+                                 :ignore_input_file_header
                                  )
 
       @client = Mysql2::Client.new(mysql2_connect_hash(connect_url).merge(local_infile: true))
@@ -38,7 +39,13 @@ module Kiba::Plus::Destination
     end
 
     def ignore_lines
-      options.fetch(:ignore_lines, 0)
+      lines = options.fetch(:ignore_lines, 0).to_i
+      lines += 1 if ignore_input_file_header
+      lines
+    end
+
+    def ignore_input_file_header
+      !!options.fetch(:ignore_input_file_header, false)
     end
 
     def write(row)
@@ -67,20 +74,27 @@ module Kiba::Plus::Destination
         @client.query(truncate_sql)
       end
 
-      bulk_sql = <<-SQL
-        LOAD DATA LOCAL INFILE '#{input_file}'
-          REPLACE INTO TABLE #{table_name}
-          FIELDS
-          TERMINATED BY '#{delimited_by}'
-          ENCLOSED BY '#{enclosed_by}'
-          IGNORE #{ignore_lines} LINES
-          (#{columns.join(',')})
-      SQL
-      Kiba::Plus.logger.info bulk_sql
-      @client.query(bulk_sql)
+      sql = bulk_sql
+      Kiba::Plus.logger.info sql
+      @client.query(sql)
 
       @client.close
       @client = nil
+    end
+
+    private
+
+    def bulk_sql
+      %Q^
+      LOAD DATA LOCAL INFILE '#{input_file}'
+        REPLACE
+        INTO TABLE #{table_name}
+        FIELDS
+          TERMINATED BY '#{delimited_by}'
+          ENCLOSED BY '#{enclosed_by}'
+        IGNORE #{ignore_lines} LINES
+        (#{columns.join(',')})
+      ^.gsub(/[\n][\s]*[\n]/, "\n")
     end
   end
 end
