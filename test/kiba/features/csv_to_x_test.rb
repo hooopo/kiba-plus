@@ -29,6 +29,13 @@ class Kiba::Features::CsvToXTest < Minitest::Test
       column :last_name, String
     end
 
+
+    if dest_pg_db.table_exists? :customers_staging
+      dest_pg_db.drop_table :customers_staging
+    end
+    if dest_pg_db.table_exists? :customers
+      dest_pg_db.drop_table :customers
+    end
     dest_pg_db.create_table! :customers do
       primary_key :id
       column :email, String
