@@ -22,6 +22,34 @@ module Kiba::Plus::Destination
       init
     end
 
+    def write(row)
+      begin
+        @conn.put_copy_data CSV.generate_line(row.values_at(*columns))
+      rescue Exception => err
+        errmsg = "%s while copy data: %s" % [ err.class.name, err.message ]
+        @conn.put_copy_end( errmsg )
+        Kiba::Plus.logger.error @conn.get_result
+        raise
+      end
+    end
+
+    def close
+      @conn.put_copy_end
+      @conn.get_last_result
+      if incremental
+        delete_before_insert
+        merge_to_target_table
+        truncate_staging_table
+      end
+    rescue
+      raise
+    ensure
+      @conn.close
+      @conn = nil
+    end
+
+    private
+
     def init
       if truncate
         truncate_staging_table
@@ -61,34 +89,6 @@ module Kiba::Plus::Destination
     def unique_by
       options.fetch(:unique_by, :id)
     end
-
-    def write(row)
-      begin
-        @conn.put_copy_data CSV.generate_line(row.values_at(*columns))
-      rescue Exception => err
-        errmsg = "%s while copy data: %s" % [ err.class.name, err.message ]
-        @conn.put_copy_end( errmsg )
-        Kiba::Plus.logger.error @conn.get_result
-        raise
-      end
-    end
-
-    def close
-      @conn.put_copy_end
-      @conn.get_last_result
-      if incremental
-        delete_before_insert
-        merge_to_target_table
-        truncate_staging_table
-      end
-    rescue
-      raise
-    ensure
-      @conn.close
-      @conn = nil
-    end
-
-    private
 
     def bulk_sql_with_incremental
       %Q^

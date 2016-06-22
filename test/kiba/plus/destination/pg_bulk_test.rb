@@ -37,84 +37,84 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
     assert_equal @options, @obj.options
   end
 
-  def test_connect_url
-    assert_equal @@connect_urls[:pg_dest], @obj.connect_url
-
-    @obj.options.delete :connect_url
-    assert_raises (KeyError) { @obj.connect_url }
-  end
-
-  def test_table_name
-    assert_equal 'customers', @obj.table_name
-
-    @obj.options.delete :table_name
-    assert_raises (KeyError) { @obj.table_name }
-  end
-
-  def test_columns
-    assert_equal [:id, :email, :first_name, :last_name], @obj.columns
-
-    @obj.options.delete :columns
-    assert_raises (KeyError) { @obj.columns }
-  end
-
-  def test_truncate
-    @obj.options.delete :truncate
-    assert_equal false, @obj.truncate
-
-    @obj.options[:truncate] = true
-    assert_equal true, @obj.truncate
-  end
-
-  def test_incremental
-    @obj.options.delete :incremental
-    assert_equal true, @obj.incremental
-
-    @obj.options[:incremental] = false
-    assert_equal false, @obj.incremental
-  end
-
-  def test_unique_by
-    @obj.options.delete :unique_by
-    assert_equal :id, @obj.unique_by
-
-    @obj.options[:unique_by] = :uuid
-    assert_equal :uuid, @obj.unique_by
-  end
-
-  def test_input_file
-    assert_equal "#{@@test_dir}/data/customer.csv", @obj.input_file
-
-    @obj.options.delete :input_file
-    assert_raises (KeyError) { @obj.input_file }
-  end
-
-  def test_ignore_input_file_header
-    @obj.options.delete :ignore_input_file_header
-    assert_equal false, @obj.ignore_input_file_header
-
-    @obj.options[:ignore_input_file_header] = true
-    assert_equal true, @obj.ignore_input_file_header
-  end
-
-  def test_copy_to_target_table
-    @obj.stub :copy_to_target_table_sql, 'select now();' do
-      assert_instance_of PG::Result, @obj.copy_to_target_table
-    end
-  end
-
-  def test_copy_to_staging_table
-    @obj.stub :copy_to_staging_table_sql, 'select now();' do
-      assert_instance_of PG::Result, @obj.copy_to_staging_table
-    end
-  end
-
   def test_write
     assert_equal nil, @obj.write([])
   end
 
   def test_close
     # TODO
+  end
+
+  def test_connect_url
+    assert_equal @@connect_urls[:pg_dest], @obj.send(:connect_url)
+
+    @obj.options.delete :connect_url
+    assert_raises (KeyError) { @obj.send(:connect_url) }
+  end
+
+  def test_table_name
+    assert_equal 'customers', @obj.send(:table_name)
+
+    @obj.options.delete :table_name
+    assert_raises (KeyError) { @obj.send(:table_name) }
+  end
+
+  def test_columns
+    assert_equal [:id, :email, :first_name, :last_name], @obj.send(:columns)
+
+    @obj.options.delete :columns
+    assert_raises (KeyError) { @obj.send(:columns) }
+  end
+
+  def test_truncate
+    @obj.options.delete :truncate
+    assert_equal false, @obj.send(:truncate)
+
+    @obj.options[:truncate] = true
+    assert_equal true, @obj.send(:truncate)
+  end
+
+  def test_incremental
+    @obj.options.delete :incremental
+    assert_equal true, @obj.send(:incremental)
+
+    @obj.options[:incremental] = false
+    assert_equal false, @obj.send(:incremental)
+  end
+
+  def test_unique_by
+    @obj.options.delete :unique_by
+    assert_equal :id, @obj.send(:unique_by)
+
+    @obj.options[:unique_by] = :uuid
+    assert_equal :uuid, @obj.send(:unique_by)
+  end
+
+  def test_input_file
+    assert_equal "#{@@test_dir}/data/customer.csv", @obj.send(:input_file)
+
+    @obj.options.delete :input_file
+    assert_raises (KeyError) { @obj.send(:input_file) }
+  end
+
+  def test_ignore_input_file_header
+    @obj.options.delete :ignore_input_file_header
+    assert_equal false, @obj.send(:ignore_input_file_header)
+
+    @obj.options[:ignore_input_file_header] = true
+    assert_equal true, @obj.send(:ignore_input_file_header)
+  end
+
+  def test_copy_to_target_table
+    @obj.stub :copy_to_target_table_sql, 'select now();' do
+      assert_instance_of PG::Result, @obj.send(:copy_to_target_table)
+    end
+  end
+
+  def test_copy_to_staging_table
+    @obj.stub :copy_to_staging_table_sql, 'select now();' do
+      assert_instance_of PG::Result, @obj.send(:copy_to_staging_table)
+    end
   end
 
   def test_copy_to_target_table_sql

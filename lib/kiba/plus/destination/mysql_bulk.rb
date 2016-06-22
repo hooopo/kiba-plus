@@ -23,7 +23,28 @@ module Kiba::Plus::Destination
       @client = Mysql2::Client.new(mysql2_connect_hash(connect_url).merge(local_infile: true))
     end
 
-    def connect_url
+    def write(row)
+      # blank!
+    end
+
+    def close
+      if truncate
+        sql = truncate_sql
+        Kiba::Plus.logger.info sql
+        client.query(sql)
+      end
+
+      sql = bulk_sql
+      Kiba::Plus.logger.info sql
+      client.query(sql)
+
+      client.close
+      @client = nil
+    end
+
+    private
+
+   def connect_url
       options.fetch(:connect_url)
     end
 
@@ -62,27 +83,6 @@ module Kiba::Plus::Destination
     def ignore_lines
       options.fetch(:ignore_lines, 0).to_i
     end
-
-    def write(row)
-      # blank!
-    end
-
-    def close
-      if truncate
-        sql = truncate_sql
-        Kiba::Plus.logger.info sql
-        client.query(sql)
-      end
-
-      sql = bulk_sql
-      Kiba::Plus.logger.info sql
-      client.query(sql)
-
-      client.close
-      @client = nil
-    end
-
-    private
 
     def real_ignore_lines
       lines = ignore_lines

@@ -21,6 +21,27 @@ module Kiba::Plus::Destination
       init
     end
 
+    def write(row)
+      # blank!
+    end
+
+    def close
+      if incremental
+        truncate_staging_table
+        create_staging_table
+        copy_to_staging_table
+        delete_before_insert
+        merge_to_target_table
+        truncate_staging_table
+      else
+        copy_to_target_table
+      end
+      @conn.close
+      @conn = nil
+    end
+
+    private
+
     def init
       if truncate
         truncate_staging_table
@@ -71,27 +92,6 @@ module Kiba::Plus::Destination
       Kiba::Plus.logger.info sql
       @conn.exec(sql)
     end
-
-    def write(row)
-      # blank!
-    end
-
-    def close
-      if incremental
-        truncate_staging_table
-        create_staging_table
-        copy_to_staging_table
-        delete_before_insert
-        merge_to_target_table
-        truncate_staging_table
-      else
-        copy_to_target_table
-      end
-      @conn.close
-      @conn = nil
-    end
-
-    private
 
     def copy_to_target_table_sql
       %Q^
