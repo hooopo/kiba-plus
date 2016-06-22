@@ -4,22 +4,22 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
 
   def setup
     @options = {
-      connect_url: @@connect_urls[:mysql2_src],
+      connect_url: @@connect_urls[:mysql2_dest],
       table_name: 'customers',
       columns: [:id, :email, :first_name, :last_name],
-      input_file: '/tmp/customer.csv'
+      input_file: File.join(@@test_dir, 'data/customer.csv')
     }
 
     @obj = Kiba::Plus::Destination::MysqlBulk.new(@options)
   end
 
-  def test_initialize_with_simple_options
+  def test_initialize
     assert_instance_of Mysql2::Client, @obj.client
     assert_equal @options, @obj.options
   end
 
   def test_connect_url
-    assert_equal @@connect_urls[:mysql2_src], @obj.connect_url
+    assert_equal @@connect_urls[:mysql2_dest], @obj.connect_url
 
     @obj.options.delete :connect_url
     assert_raises (KeyError) { @obj.connect_url }
@@ -56,7 +56,7 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
   end
 
   def test_input_file
-    assert_equal '/tmp/customer.csv', @obj.input_file
+    assert_equal "#{@@test_dir}/data/customer.csv", @obj.input_file
 
     @obj.options.delete :input_file
     assert_raises (KeyError) { @obj.input_file }
@@ -99,22 +99,22 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
   end
 
   def test_close_when_truncate
-    @obj.options[:truncate] = true
-
-    @obj.stub :truncate_sql, 'select now();' do
-      @obj.stub :bulk_sql, 'select now();' do
-        @obj.close
-        assert_equal nil, @obj.client
+    @obj.stub :truncate, true do
+      @obj.stub :truncate_sql, 'select now();' do
+        @obj.stub :bulk_sql, 'select now();' do
+          @obj.close
+          assert_equal nil, @obj.client
+        end
       end
     end
   end
 
   def test_close_when_non_truncate
-    @obj.options[:truncate] = false
-
-    @obj.stub :bulk_sql, 'select now();' do
-      @obj.close
-      assert_equal nil, @obj.client
+    @obj.stub :truncate, false do
+      @obj.stub :bulk_sql, 'select now();' do
+        @obj.close
+        assert_equal nil, @obj.client
+      end
     end
   end
 
@@ -138,18 +138,21 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
 
   def test_bulk_sql
     expected_sql = %Q^
-    LOAD DATA LOCAL INFILE '/tmp/customer.csv'
+    LOAD DATA LOCAL INFILE '#{@@test_dir}/data/customer.csv'
         REPLACE
         INTO TABLE customers
         FIELDS
           TERMINATED BY ','
           ENCLOSED BY '"'
-        IGNORE 0 LINES
+        IGNORE 1 LINES
         (id,email,first_name,last_name)
     ^.gsub(/[\s]+/, ' ').strip
-    sql = @obj.send(:bulk_sql).gsub(/[\s]+/, ' ').strip
 
-    assert_equal expected_sql, sql
+    @obj.stub :real_ignore_lines, 1 do
+      sql = @obj.send(:bulk_sql).gsub(/[\s]+/, ' ').strip
+
+      assert_equal expected_sql, sql
+    end
   end
 
 end

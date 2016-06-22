@@ -34,9 +34,13 @@ module Minitest::MyPlugin
   end
   @@database_cleaners.each { |cleaner| cleaner.strategy = :truncation }
 
+  @@test_dir = File.expand_path('..', __FILE__)
+
   def self.included(base)
     base.class_variable_set(:@@connect_urls, @@connect_urls)
     base.class_variable_set(:@@sequel_dbs, @@sequel_dbs)
+
+    base.class_variable_set(:@@test_dir, @@test_dir)
   end
 
   def before_setup

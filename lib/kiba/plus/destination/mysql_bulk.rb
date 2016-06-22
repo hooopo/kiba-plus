@@ -64,6 +64,7 @@ module Kiba::Plus::Destination
     end
 
     def write(row)
+      # blank!
     end
 
     def close

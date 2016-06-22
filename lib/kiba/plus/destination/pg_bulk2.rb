@@ -4,20 +4,25 @@ require_relative 'pg_bulk_utils'
 module Kiba::Plus::Destination
   class PgBulk2
     include PgBulkUtils
-    attr_reader :options
+    attr_reader :options, :conn
 
     def initialize(options = {})
       @options = options
-      @options.assert_valid_keys(:table_name,
-                                 :columns,
-                                 :connect_url,
-                                 :truncate,
-                                 :incremental,
-                                 :unique_by,
-                                 :ignore_input_file_header
-                                 )
+      @options.assert_valid_keys(
+        :connect_url,
+        :table_name,
+        :columns,
+        :truncate,
+        :incremental,
+        :unique_by
+      )
 
       @conn = PG.connect(connect_url)
+
+      init
+    end
+
+    def init
       if truncate
         truncate_staging_table
         truncate_target_table
@@ -41,17 +46,6 @@ module Kiba::Plus::Destination
       options.fetch(:table_name)
     end
 
-    def write(row)
-      begin
-        @conn.put_copy_data CSV.generate_line(row.values_at(*columns))
-      rescue Exception => err
-        errmsg = "%s while copy data: %s" % [ err.class.name, err.message ]
-        @conn.put_copy_end( errmsg )
-        Kiba::Plus.logger.error @conn.get_result
-        raise
-      end
-    end
-
     def columns
       options.fetch(:columns)
     end
@@ -68,8 +62,15 @@ module Kiba::Plus::Destination
       options.fetch(:unique_by, :id)
     end
 
-    def ignore_input_file_header
-      !!options.fetch(:ignore_input_file_header, false)
+    def write(row)
+      begin
+        @conn.put_copy_data CSV.generate_line(row.values_at(*columns))
+      rescue Exception => err
+        errmsg = "%s while copy data: %s" % [ err.class.name, err.message ]
+        @conn.put_copy_end( errmsg )
+        Kiba::Plus.logger.error @conn.get_result
+        raise
+      end
     end
 
     def close
@@ -94,7 +95,6 @@ module Kiba::Plus::Destination
       COPY #{staging_table_name} (#{columns.join(', ')})
         FROM STDIN
           WITH
-            #{ignore_input_file_header ? 'HEADER' : ''}
             DELIMITER ','
             NULL '\\N'
             CSV
@@ -106,7 +106,6 @@ module Kiba::Plus::Destination
       COPY #{table_name} (#{columns.join(', ')})
         FROM STDIN
           WITH
-            #{ignore_input_file_header ? 'HEADER' : ''}
             DELIMITER ','
             NULL '\\N'
             CSV

@@ -2,7 +2,7 @@ require 'pg'
 
 module Kiba::Plus::Destination
   class Pg
-    attr_reader :options
+    attr_reader :options, :conn
 
     def initialize(options = {})
       @options = options

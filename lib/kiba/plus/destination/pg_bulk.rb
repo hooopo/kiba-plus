@@ -2,21 +2,26 @@ require_relative 'pg_bulk_utils'
 module Kiba::Plus::Destination
   class PgBulk
     include PgBulkUtils
-    attr_reader :options
+    attr_reader :options, :conn
 
     def initialize(options = {})
       @options = options
       @options.assert_valid_keys(
-       :connect_url,
-       :input_file,
-       :table_name,
-       :columns,
-       :truncate,
-       :incremental,
-       :unique_by,
-       :ignore_input_file_header
-       )
+        :connect_url,
+        :table_name,
+        :columns,
+        :truncate,
+        :incremental,
+        :unique_by,
+        :input_file,
+        :ignore_input_file_header
+      )
       @conn = PG.connect(connect_url)
+
+      init
+    end
+
+    def init
       if truncate
         truncate_staging_table
         truncate_target_table
@@ -29,10 +34,6 @@ module Kiba::Plus::Destination
 
     def table_name
       options.fetch(:table_name)
-    end
-
-    def input_file
-      options.fetch(:input_file)
     end
 
     def columns
@@ -51,18 +52,22 @@ module Kiba::Plus::Destination
       options.fetch(:unique_by, :id)
     end
 
+    def input_file
+      options.fetch(:input_file)
+    end
+
     def ignore_input_file_header
       !!options.fetch(:ignore_input_file_header, false)
     end
 
     def copy_to_target_table
-      sql = sql_with_copy_to_target_table
+      sql = copy_to_target_table_sql
       Kiba::Plus.logger.info sql
       @conn.exec(sql)
     end
 
     def copy_to_staging_table
-      sql = sql_with_copy_to_staging_table
+      sql = copy_to_staging_table_sql
       Kiba::Plus.logger.info sql
       @conn.exec(sql)
     end
@@ -88,7 +93,7 @@ module Kiba::Plus::Destination
 
     private
 
-    def sql_with_copy_to_target_table
+    def copy_to_target_table_sql
       %Q^
       COPY #{table_name} (#{columns.join(', ')})
         FROM '#{File.expand_path(input_file)}'
@@ -100,7 +105,7 @@ module Kiba::Plus::Destination
       ^.gsub(/[\n][\s]*[\n]/, "\n")
     end
 
-    def sql_with_copy_to_staging_table
+    def copy_to_staging_table_sql
       %Q^
       COPY #{staging_table_name} (#{columns.join(', ')})
         FROM '#{File.expand_path(input_file)}'
