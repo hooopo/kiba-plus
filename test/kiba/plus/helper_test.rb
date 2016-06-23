@@ -52,5 +52,9 @@ class Kiba::Plus::HelperTest < Minitest::Test
     assert_equal expected, result
   end
 
+  def test_format_sql
+    # TODO
+  end
+
 
 end

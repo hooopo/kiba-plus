@@ -11,21 +11,12 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
     if dest_pg_db.table_exists? :customers_staging
       dest_pg_db.drop_table :customers_staging
     end
-    if dest_pg_db.table_exists? :customers
-      dest_pg_db.drop_table :customers
-    end
     dest_pg_db.create_table! :customers do
       primary_key :id
       column :email, String
       column :first_name, String
       column :last_name, String
     end
-  end
-
-  def after_setup
-    super
-
-    @obj.conn.put_copy_end
   end
 
   def setup
@@ -36,6 +27,14 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
     }
 
     @obj = Kiba::Plus::Destination::PgBulk2.new(@options)
+  end
+
+  def teardown
+    super
+
+    if @obj.conn
+      @obj.conn.put_copy_end
+    end
   end
 
   def test_initialize
@@ -106,12 +105,12 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^.gsub(/[\s]+/, ' ').strip
+    ^
 
     @obj.stub :staging_table_name, 'customers_staging' do
-      sql = @obj.send(:bulk_sql_with_incremental).gsub(/[\s]+/, ' ').strip
+      sql = @obj.send(:bulk_sql_with_incremental)
 
-      assert_equal expected_sql, sql
+      assert_equal wrap_sql(expected_sql), wrap_sql(sql)
     end
   end
 
@@ -123,12 +122,12 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^.gsub(/[\s]+/, ' ').strip
+    ^
 
     @obj.stub :table_name, 'customers' do
-      sql = @obj.send(:bulk_sql_with_non_incremental).gsub(/[\s]+/, ' ').strip
+      sql = @obj.send(:bulk_sql_with_non_incremental)
 
-      assert_equal expected_sql, sql
+      assert_equal wrap_sql(expected_sql), wrap_sql(sql)
     end
   end
 

@@ -25,9 +25,6 @@ class Kiba::Features::MysqlToXTest < Minitest::Test
     if dest_pg_db.table_exists? :customers_staging
       dest_pg_db.drop_table :customers_staging
     end
-    if dest_pg_db.table_exists? :customers
-      dest_pg_db.drop_table :customers
-    end
     dest_pg_db.create_table! :customers do
       primary_key :id
       column :email, String
@@ -85,9 +82,6 @@ end
     run_etl_content etl_content
 
     csv_rows = CSV.read(dest_csv_path)
-
-    # csv_header = csv_rows.shift
-    # assert_equal [:id, :email, :first_name, :last_name], csv_header
 
     assert_equal 10, csv_rows.size
     assert_equal 'user10@example.com', csv_rows.last[1]
