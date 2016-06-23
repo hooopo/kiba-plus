@@ -86,9 +86,6 @@ end
 
     csv_rows = CSV.read(dest_csv_path)
 
-    # csv_header = csv_rows.shift
-    # assert_equal [:id, :email, :first_name, :last_name], csv_header
-
     assert_equal 10, csv_rows.size
     assert_equal 'user10@example.com', csv_rows.last[1]
   end

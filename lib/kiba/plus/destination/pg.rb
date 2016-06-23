@@ -13,7 +13,7 @@ module Kiba::Plus::Destination
         :columns
       )
       @conn = PG.connect(connect_url)
-      @conn.prepare(prepare_name, prepare_sql)
+      init
     end
 
     def write(row)
@@ -31,6 +31,10 @@ module Kiba::Plus::Destination
     end
 
     private
+
+    def init
+      @conn.prepare(prepare_name, prepare_sql)
+    end
 
     def connect_url
       options.fetch(:connect_url)

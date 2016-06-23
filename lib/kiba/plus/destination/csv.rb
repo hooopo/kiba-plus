@@ -2,7 +2,7 @@ require 'csv'
 
 module Kiba::Plus::Destination
   class Csv
-    attr_reader :options
+    attr_reader :options, :csv
 
     def initialize(options = {})
       @options = options
