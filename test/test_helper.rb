@@ -86,6 +86,10 @@ module Minitest::MyPlugin
     File.join(Dir.tmpdir, 'csv')
   end
 
+  def wrap_sql(sql)
+    sql.to_s.gsub(/[\s]+/, ' ').strip
+  end
+
 end
 
 class MiniTest::Test
@@ -96,3 +100,6 @@ end
 
 module Kiba::Features
 end
+
+# disable log
+Kiba::Plus.logger = Logger.new('/dev/null')

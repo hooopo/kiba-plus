@@ -22,12 +22,6 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
     end
   end
 
-  def after_setup
-    super
-
-    @obj.conn.put_copy_end
-  end
-
   def setup
     @options = {
       connect_url: @@connect_urls[:pg_dest],
@@ -36,6 +30,14 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
     }
 
     @obj = Kiba::Plus::Destination::PgBulk2.new(@options)
+  end
+
+  def teardown
+    super
+
+    if @obj.conn
+      @obj.conn.put_copy_end
+    end
   end
 
   def test_initialize
@@ -106,12 +108,12 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^.gsub(/[\s]+/, ' ').strip
+    ^
 
     @obj.stub :staging_table_name, 'customers_staging' do
-      sql = @obj.send(:bulk_sql_with_incremental).gsub(/[\s]+/, ' ').strip
+      sql = @obj.send(:bulk_sql_with_incremental)
 
-      assert_equal expected_sql, sql
+      assert_equal wrap_sql(expected_sql), wrap_sql(sql)
     end
   end
 
@@ -123,12 +125,12 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^.gsub(/[\s]+/, ' ').strip
+    ^
 
     @obj.stub :table_name, 'customers' do
-      sql = @obj.send(:bulk_sql_with_non_incremental).gsub(/[\s]+/, ' ').strip
+      sql = @obj.send(:bulk_sql_with_non_incremental)
 
-      assert_equal expected_sql, sql
+      assert_equal wrap_sql(expected_sql), wrap_sql(sql)
     end
   end
 

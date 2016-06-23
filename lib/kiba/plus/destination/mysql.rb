@@ -3,7 +3,7 @@ require 'mysql2'
 module Kiba::Plus::Destination
   class Mysql
     include Kiba::Plus::Helper
-    attr_reader :options
+    attr_reader :options, :client
 
     def initialize(options = {})
       @options = options
@@ -13,7 +13,7 @@ module Kiba::Plus::Destination
         :columns
       )
       @client = Mysql2::Client.new(mysql2_connect_hash(connect_url))
-      @pre_stmt = @client.prepare(prepare_sql)
+      init
     end
 
     def write(row)
@@ -29,6 +29,10 @@ module Kiba::Plus::Destination
     end
 
     private
+
+    def init
+      @pre_stmt = @client.prepare(prepare_sql)
+    end
 
     def connect_url
       options.fetch(:connect_url)

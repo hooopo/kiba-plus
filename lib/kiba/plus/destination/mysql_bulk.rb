@@ -44,7 +44,7 @@ module Kiba::Plus::Destination
 
     private
 
-   def connect_url
+    def connect_url
       options.fetch(:connect_url)
     end
 

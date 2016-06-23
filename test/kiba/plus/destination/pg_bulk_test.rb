@@ -125,10 +125,10 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^.gsub(/[\s]+/, ' ').strip
-    sql = @obj.send(:copy_to_target_table_sql).gsub(/[\s]+/, ' ').strip
+    ^
+    sql = @obj.send(:copy_to_target_table_sql)
 
-    assert_equal expected_sql, sql
+    assert_equal wrap_sql(expected_sql), wrap_sql(sql)
   end
 
   def test_copy_to_target_table_sql_when_ignore_input_file_header
@@ -140,12 +140,12 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^.gsub(/[\s]+/, ' ').strip
+    ^
 
     @obj.stub :ignore_input_file_header, true do
-      sql = @obj.send(:copy_to_target_table_sql).gsub(/[\s]+/, ' ').strip
+      sql = @obj.send(:copy_to_target_table_sql)
 
-      assert_equal expected_sql, sql
+      assert_equal wrap_sql(expected_sql), wrap_sql(sql)
     end
   end
 
@@ -157,10 +157,10 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^.gsub(/[\s]+/, ' ').strip
-    sql = @obj.send(:copy_to_staging_table_sql).gsub(/[\s]+/, ' ').strip
+    ^
+    sql = @obj.send(:copy_to_staging_table_sql)
 
-    assert_equal expected_sql, sql
+    assert_equal wrap_sql(expected_sql), wrap_sql(sql)
   end
 
   def test_copy_to_staging_table_sql_when_ignore_input_file_header
@@ -172,12 +172,12 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^.gsub(/[\s]+/, ' ').strip
+    ^
 
     @obj.stub :ignore_input_file_header, true do
-      sql = @obj.send(:copy_to_staging_table_sql).gsub(/[\s]+/, ' ').strip
+      sql = @obj.send(:copy_to_staging_table_sql)
 
-      assert_equal expected_sql, sql
+      assert_equal wrap_sql(expected_sql), wrap_sql(sql)
     end
   end
 

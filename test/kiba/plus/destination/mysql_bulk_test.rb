@@ -146,12 +146,12 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
           ENCLOSED BY '"'
         IGNORE 1 LINES
         (id,email,first_name,last_name)
-    ^.gsub(/[\s]+/, ' ').strip
+    ^
 
     @obj.stub :real_ignore_lines, 1 do
-      sql = @obj.send(:bulk_sql).gsub(/[\s]+/, ' ').strip
+      sql = @obj.send(:bulk_sql)
 
-      assert_equal expected_sql, sql
+      assert_equal wrap_sql(expected_sql), wrap_sql(sql)
     end
   end
 
