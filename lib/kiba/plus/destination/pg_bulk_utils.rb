@@ -1,5 +1,8 @@
 module Kiba::Plus::Destination
   module PgBulkUtils
+
+    private
+
     def staging_table_name
       table_name + "_staging"
     end
@@ -11,7 +14,11 @@ module Kiba::Plus::Destination
     end
 
     def create_staging_table_sql
-      sql = "CREATE TABLE IF NOT EXISTS #{staging_table_name} (LIKE #{table_name} INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES)"
+      sql = %Q^
+      CREATE TABLE IF NOT EXISTS #{staging_table_name} (
+        LIKE #{table_name} INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES
+      )
+      ^
       format_sql sql
     end
 
@@ -33,7 +40,7 @@ module Kiba::Plus::Destination
     end
 
     def truncate_target_table_sql
-      sql = "TRUNCATE TABLE #{table_name};"
+      sql = "TRUNCATE TABLE #{table_name}"
       format_sql sql
     end
 

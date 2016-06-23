@@ -24,8 +24,8 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
 
   def test_close_when_truncate
     @obj.stub :truncate, true do
-      @obj.stub :truncate_sql, 'select now();' do
-        @obj.stub :bulk_sql, 'select now();' do
+      @obj.stub :truncate_sql, 'select now()' do
+        @obj.stub :bulk_sql, 'select now()' do
           @obj.close
           assert_equal nil, @obj.client
         end
@@ -35,7 +35,7 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
 
   def test_close_when_non_truncate
     @obj.stub :truncate, false do
-      @obj.stub :bulk_sql, 'select now();' do
+      @obj.stub :bulk_sql, 'select now()' do
         @obj.close
         assert_equal nil, @obj.client
       end
@@ -133,7 +133,7 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
   end
 
   def test_truncate_sql
-    assert_equal 'TRUNCATE TABLE customers;', @obj.send(:truncate_sql)
+    assert_equal 'TRUNCATE TABLE customers', @obj.send(:truncate_sql)
   end
 
   def test_bulk_sql

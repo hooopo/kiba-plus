@@ -91,7 +91,7 @@ module Kiba::Plus::Destination
     end
 
     def truncate_sql
-      sql = "TRUNCATE TABLE #{table_name};"
+      sql = "TRUNCATE TABLE #{table_name}"
       format_sql sql
     end
 

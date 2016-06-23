@@ -106,13 +106,13 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
   end
 
   def test_copy_to_target_table
-    @obj.stub :copy_to_target_table_sql, 'select now();' do
+    @obj.stub :copy_to_target_table_sql, 'select now()' do
       assert_instance_of PG::Result, @obj.send(:copy_to_target_table)
     end
   end
 
   def test_copy_to_staging_table
-    @obj.stub :copy_to_staging_table_sql, 'select now();' do
+    @obj.stub :copy_to_staging_table_sql, 'select now()' do
       assert_instance_of PG::Result, @obj.send(:copy_to_staging_table)
     end
   end
