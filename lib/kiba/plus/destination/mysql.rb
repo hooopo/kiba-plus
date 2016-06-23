@@ -21,6 +21,7 @@ module Kiba::Plus::Destination
     rescue => e
       Kiba::Plus.logger.error "ERROR for #{row}"
       Kiba::Plus.logger.error e.message
+      raise e
     end
 
     def close

@@ -23,6 +23,7 @@ module Kiba::Plus::Destination
       Kiba::Plus.logger.error "ERROR for #{row}"
       Kiba::Plus.logger.error ex.message
       # Maybe, write to db table or file
+      raise ex
     end
 
     def close
