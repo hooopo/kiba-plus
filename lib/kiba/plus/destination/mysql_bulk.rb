@@ -91,11 +91,12 @@ module Kiba::Plus::Destination
     end
 
     def truncate_sql
-      "TRUNCATE TABLE #{table_name};"
+      sql = "TRUNCATE TABLE #{table_name};"
+      format_sql sql
     end
 
     def bulk_sql
-      %Q^
+      sql = %Q^
       LOAD DATA LOCAL INFILE '#{input_file}'
         REPLACE
         INTO TABLE #{table_name}
@@ -104,7 +105,8 @@ module Kiba::Plus::Destination
           ENCLOSED BY '#{enclosed_by}'
         IGNORE #{real_ignore_lines} LINES
         (#{columns.join(',')})
-      ^.gsub(/[\n][\s]*[\n]/, "\n")
+      ^
+      format_sql sql
     end
 
   end

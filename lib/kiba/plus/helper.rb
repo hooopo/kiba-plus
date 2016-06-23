@@ -19,6 +19,11 @@ module Kiba
         u = URI.parse(url)
         u.scheme
       end
+
+      def format_sql(sql)
+        sql.to_s.gsub(/[\n][\s]*[\n]/, "\n")
+      end
+
     end
   end
 end

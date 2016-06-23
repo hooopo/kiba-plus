@@ -4,6 +4,7 @@ require_relative 'pg_bulk_utils'
 module Kiba::Plus::Destination
   class PgBulk2
     include PgBulkUtils
+    include Kiba::Plus::Helper
     attr_reader :options, :conn
 
     def initialize(options = {})
@@ -63,7 +64,7 @@ module Kiba::Plus::Destination
         sql = bulk_sql_with_non_incremental
       end
       Kiba::Plus.logger.info sql
-      @res = @conn.exec(sql)
+      @conn.exec(sql)
     end
 
     def connect_url
@@ -91,25 +92,27 @@ module Kiba::Plus::Destination
     end
 
     def bulk_sql_with_incremental
-      %Q^
+      sql = %Q^
       COPY #{staging_table_name} (#{columns.join(', ')})
         FROM STDIN
           WITH
             DELIMITER ','
             NULL '\\N'
             CSV
-      ^.gsub(/[\n][\s]*[\n]/, "\n")
+      ^
+      format_sql sql
     end
 
     def bulk_sql_with_non_incremental
-      %Q^
+      sql = %Q^
       COPY #{table_name} (#{columns.join(', ')})
         FROM STDIN
           WITH
             DELIMITER ','
             NULL '\\N'
             CSV
-      ^.gsub(/[\n][\s]*[\n]/, "\n")
+      ^
+      format_sql sql
     end
 
   end
