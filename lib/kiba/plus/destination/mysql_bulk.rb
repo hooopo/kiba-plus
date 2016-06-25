@@ -96,7 +96,7 @@ module Kiba::Plus::Destination
     end
 
     def bulk_sql
-      sql = %Q^
+      sql = <<-SQL
       LOAD DATA LOCAL INFILE '#{input_file}'
         REPLACE
         INTO TABLE #{table_name}
@@ -105,7 +105,7 @@ module Kiba::Plus::Destination
           ENCLOSED BY '#{enclosed_by}'
         IGNORE #{real_ignore_lines} LINES
         (#{columns.join(',')})
-      ^
+      SQL
       format_sql sql
     end
 

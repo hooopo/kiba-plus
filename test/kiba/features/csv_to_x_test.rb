@@ -44,7 +44,7 @@ class Kiba::Features::CsvToXTest < Minitest::Test
   def test_to_mysql_with_examples_customer_csv_to_mysql
     build
 
-    etl_content = %Q^
+    etl_content = <<-ETL
 require 'kiba/plus'
 
 DEST_URL   = '#{dest_mysql2_url}'
@@ -59,7 +59,7 @@ destination Kiba::Plus::Destination::MysqlBulk, { :connect_url => DEST_URL,
 
 post_process do
 end
-^
+ETL
     run_etl_content etl_content
 
     assert_equal 10, dest_mysql2_db[:customers].count
@@ -76,7 +76,7 @@ end
     src_csv_path_with_pg = File.join pg_copy_tmp_dir, File.basename(src_csv_path)
     FileUtils.cp src_csv_path, src_csv_path_with_pg
 
-    etl_content = %Q^
+    etl_content = <<-ETL
 require 'kiba/plus'
 
 DEST_URL   = '#{dest_pg_url}'
@@ -91,7 +91,7 @@ destination Kiba::Plus::Destination::PgBulk, { :connect_url => DEST_URL,
 
 post_process do
 end
-^
+ETL
     run_etl_content etl_content
 
     FileUtils.rm_rf src_csv_path_with_pg

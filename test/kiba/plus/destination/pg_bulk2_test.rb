@@ -98,14 +98,14 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
 
 
   def test_bulk_sql_with_incremental
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     COPY customers_staging (id, email, first_name, last_name)
         FROM STDIN
           WITH
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^
+    SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do
       sql = @obj.send(:bulk_sql_with_incremental)
@@ -115,14 +115,14 @@ class Kiba::Plus::Destination::PgBulk2Test < Minitest::Test
   end
 
   def test_bulk_sql_with_non_incremental
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     COPY customers (id, email, first_name, last_name)
         FROM STDIN
           WITH
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^
+    SQL
 
     @obj.stub :table_name, 'customers' do
       sql = @obj.send(:bulk_sql_with_non_incremental)
