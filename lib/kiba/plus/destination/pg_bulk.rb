@@ -95,7 +95,7 @@ module Kiba::Plus::Destination
     end
 
     def copy_to_target_table_sql
-      sql = %Q^
+      sql = <<-SQL
       COPY #{table_name} (#{columns.join(', ')})
         FROM '#{File.expand_path(input_file)}'
           WITH
@@ -103,13 +103,13 @@ module Kiba::Plus::Destination
             DELIMITER ','
             NULL '\\N'
             CSV
-      ^
+      SQL
 
       format_sql sql
     end
 
     def copy_to_staging_table_sql
-      sql = %Q^
+      sql = <<-SQL
       COPY #{staging_table_name} (#{columns.join(', ')})
         FROM '#{File.expand_path(input_file)}'
           WITH
@@ -117,7 +117,7 @@ module Kiba::Plus::Destination
             DELIMITER ','
             NULL '\\N'
             CSV
-      ^
+      SQL
 
       format_sql sql
     end

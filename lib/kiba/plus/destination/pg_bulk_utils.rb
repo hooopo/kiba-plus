@@ -14,11 +14,11 @@ module Kiba::Plus::Destination
     end
 
     def create_staging_table_sql
-      sql = %Q^
+      sql = <<-SQL
       CREATE TABLE IF NOT EXISTS #{staging_table_name} (
         LIKE #{table_name} INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES
       )
-      ^
+      SQL
       format_sql sql
     end
 

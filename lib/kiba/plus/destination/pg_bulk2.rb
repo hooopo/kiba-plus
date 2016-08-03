@@ -92,26 +92,26 @@ module Kiba::Plus::Destination
     end
 
     def bulk_sql_with_incremental
-      sql = %Q^
+      sql = <<-SQL
       COPY #{staging_table_name} (#{columns.join(', ')})
         FROM STDIN
           WITH
             DELIMITER ','
             NULL '\\N'
             CSV
-      ^
+      SQL
       format_sql sql
     end
 
     def bulk_sql_with_non_incremental
-      sql = %Q^
+      sql = <<-SQL
       COPY #{table_name} (#{columns.join(', ')})
         FROM STDIN
           WITH
             DELIMITER ','
             NULL '\\N'
             CSV
-      ^
+      SQL
       format_sql sql
     end
 

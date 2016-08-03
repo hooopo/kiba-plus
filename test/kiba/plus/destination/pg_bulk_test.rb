@@ -115,21 +115,21 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
   end
 
   def test_copy_to_target_table_sql
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     COPY customers (id, email, first_name, last_name)
         FROM '#{@@test_dir}/data/customer.csv'
           WITH
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^
+    SQL
     sql = @obj.send(:copy_to_target_table_sql)
 
     assert_equal wrap_sql(expected_sql), wrap_sql(sql)
   end
 
   def test_copy_to_target_table_sql_when_ignore_input_file_header
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     COPY customers (id, email, first_name, last_name)
         FROM '#{@@test_dir}/data/customer.csv'
           WITH
@@ -137,7 +137,7 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^
+    SQL
 
     @obj.stub :ignore_input_file_header, true do
       sql = @obj.send(:copy_to_target_table_sql)
@@ -147,21 +147,21 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
   end
 
   def test_copy_to_staging_table_sql
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     COPY customers_staging (id, email, first_name, last_name)
         FROM '#{@@test_dir}/data/customer.csv'
           WITH
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^
+    SQL
     sql = @obj.send(:copy_to_staging_table_sql)
 
     assert_equal wrap_sql(expected_sql), wrap_sql(sql)
   end
 
   def test_copy_to_staging_table_sql_when_ignore_input_file_header
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     COPY customers_staging (id, email, first_name, last_name)
         FROM '#{@@test_dir}/data/customer.csv'
           WITH
@@ -169,7 +169,7 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
             DELIMITER ','
             NULL '\\N'
             CSV
-    ^
+    SQL
 
     @obj.stub :ignore_input_file_header, true do
       sql = @obj.send(:copy_to_staging_table_sql)

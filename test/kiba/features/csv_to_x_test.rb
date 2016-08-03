@@ -2,11 +2,12 @@ require 'test_helper'
 
 class Kiba::Features::CsvToXTest < Minitest::Test
 
-  attr_reader :src_csv_path
+  attr_reader :src_csv_path, :src_csv_with_header_path
   attr_reader :dest_mysql2_db, :dest_mysql2_url, :dest_pg_db, :dest_pg_url
 
   def build
     @src_csv_path = make_csv_file
+    @src_csv_with_header_path = make_csv_file
 
     @dest_mysql2_db = @@sequel_dbs[:mysql2_dest]
     @dest_mysql2_url = @@connect_urls[:mysql2_dest]
@@ -17,6 +18,15 @@ class Kiba::Features::CsvToXTest < Minitest::Test
     # default mode is 0600
     FileUtils.chmod 0666, src_csv_path
     CSV.open(src_csv_path, "wb") do |csv|
+      1.upto(10).each do |n|
+        csv << [n, "user#{n}@example.com", "first_name#{n}", "last_name#{n}"]
+      end
+    end
+
+    # default mode is 0600
+    FileUtils.chmod 0666, src_csv_with_header_path
+    CSV.open(src_csv_with_header_path, "wb") do |csv|
+      csv << [:id, :email, :first_name, :last_name]
       1.upto(10).each do |n|
         csv << [n, "user#{n}@example.com", "first_name#{n}", "last_name#{n}"]
       end
@@ -44,7 +54,7 @@ class Kiba::Features::CsvToXTest < Minitest::Test
   def test_to_mysql_with_examples_customer_csv_to_mysql
     build
 
-    etl_content = %Q^
+    etl_content = <<-ETL
 require 'kiba/plus'
 
 DEST_URL   = '#{dest_mysql2_url}'
@@ -59,7 +69,33 @@ destination Kiba::Plus::Destination::MysqlBulk, { :connect_url => DEST_URL,
 
 post_process do
 end
-^
+ETL
+    run_etl_content etl_content
+
+    assert_equal 10, dest_mysql2_db[:customers].count
+    assert_equal 'user10@example.com', dest_mysql2_db[:customers].order(:id).last[:email]
+  end
+
+  def test_to_mysql_with_csv_have_header
+    build
+
+    etl_content = <<-ETL
+require 'kiba/plus'
+
+DEST_URL   = '#{dest_mysql2_url}'
+
+destination Kiba::Plus::Destination::MysqlBulk, { :connect_url => DEST_URL,
+                                :table_name => "customers",
+                                :input_file => '#{src_csv_with_header_path}',
+                                :truncate => true,
+                                :columns => [:id, :email, :first_name, :last_name],
+                                :incremental => false,
+                                :ignore_input_file_header => true
+                              }
+
+post_process do
+end
+ETL
     run_etl_content etl_content
 
     assert_equal 10, dest_mysql2_db[:customers].count
@@ -72,11 +108,11 @@ end
     #
     # Because csv file should not in /tmp dir
     #
-    pg_copy_tmp_dir = File.expand_path('../../../pg_copy_tmp', __FILE__)
+    pg_copy_tmp_dir = File.join(@@test_dir, 'pg_copy_tmp')
     src_csv_path_with_pg = File.join pg_copy_tmp_dir, File.basename(src_csv_path)
     FileUtils.cp src_csv_path, src_csv_path_with_pg
 
-    etl_content = %Q^
+    etl_content = <<-ETL
 require 'kiba/plus'
 
 DEST_URL   = '#{dest_pg_url}'
@@ -91,7 +127,7 @@ destination Kiba::Plus::Destination::PgBulk, { :connect_url => DEST_URL,
 
 post_process do
 end
-^
+ETL
     run_etl_content etl_content
 
     FileUtils.rm_rf src_csv_path_with_pg
@@ -100,4 +136,35 @@ end
     assert_equal 'user10@example.com', dest_pg_db[:customers].order(:id).last[:email]
   end
 
+  def test_to_pg_with_csv_have_header
+    build
+
+    pg_copy_tmp_dir = File.join(@@test_dir, 'pg_copy_tmp')
+    src_csv_path_with_pg = File.join pg_copy_tmp_dir, File.basename(src_csv_with_header_path)
+    FileUtils.cp src_csv_with_header_path, src_csv_path_with_pg
+
+    etl_content = <<-ETL
+require 'kiba/plus'
+
+DEST_URL   = '#{dest_pg_url}'
+
+destination Kiba::Plus::Destination::PgBulk, { :connect_url => DEST_URL,
+                                :table_name => "customers",
+                                :input_file => '#{src_csv_path_with_pg}',
+                                :truncate => true,
+                                :columns => [:id, :email, :first_name, :last_name],
+                                :incremental => false,
+                                :ignore_input_file_header => true
+                              }
+
+post_process do
+end
+ETL
+    run_etl_content etl_content
+
+    FileUtils.rm_rf src_csv_path_with_pg
+
+    assert_equal 10, dest_pg_db[:customers].count
+    assert_equal 'user10@example.com', dest_pg_db[:customers].order(:id).last[:email]
+  end
 end

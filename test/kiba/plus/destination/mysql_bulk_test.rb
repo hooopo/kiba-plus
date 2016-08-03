@@ -137,7 +137,7 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
   end
 
   def test_bulk_sql
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     LOAD DATA LOCAL INFILE '#{@@test_dir}/data/customer.csv'
         REPLACE
         INTO TABLE customers
@@ -146,7 +146,7 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
           ENCLOSED BY '"'
         IGNORE 1 LINES
         (id,email,first_name,last_name)
-    ^
+    SQL
 
     @obj.stub :real_ignore_lines, 1 do
       sql = @obj.send(:bulk_sql)

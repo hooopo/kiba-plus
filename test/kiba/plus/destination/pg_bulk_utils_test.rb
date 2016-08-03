@@ -50,11 +50,11 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
   end
 
   def test_create_staging_table_sql
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     CREATE TABLE IF NOT EXISTS customers_staging (
       LIKE customers INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES
     )
-    ^
+    SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do
       @obj.stub :table_name, 'customers' do
@@ -66,9 +66,9 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
   end
 
   def test_truncate_staging_table_sql
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     TRUNCATE TABLE customers_staging
-    ^
+    SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do
       sql = @obj.send(:truncate_staging_table_sql)
@@ -78,9 +78,9 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
   end
 
   def test_truncate_target_table_sql
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     TRUNCATE TABLE customers
-    ^
+    SQL
 
     @obj.stub :table_name, 'customers' do
       sql = @obj.send(:truncate_target_table_sql)
@@ -90,11 +90,11 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
   end
 
   def test_delete_before_insert_sql
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     DELETE FROM customers
       USING customers_staging
       WHERE customers_staging.id = customers.id
-    ^
+    SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do
       @obj.stub :table_name, 'customers' do
@@ -108,10 +108,10 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
   end
 
   def test_merge_to_target_table_sql
-    expected_sql = %Q^
+    expected_sql = <<-SQL
     INSERT INTO customers
       (SELECT * FROM customers_staging)
-    ^
+    SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do
       @obj.stub :table_name, 'customers' do
