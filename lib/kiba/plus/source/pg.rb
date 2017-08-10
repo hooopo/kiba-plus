@@ -15,7 +15,7 @@ module Kiba
           :query
         )
         @client = PG.connect(connect_url)
-        @client.exec "SET search_path TO %s" % [ options.fetch(:schema) ] unless options.fetch(:schema).empty?
+        @client.exec "SET search_path TO %s" % [ options[:schema] ] if options[:schema]
       end
 
       def each

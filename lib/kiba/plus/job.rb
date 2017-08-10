@@ -18,7 +18,7 @@ module Kiba
           @client = Mysql2::Client.new(mysql2_connect_hash(connect_url))
         elsif url.scheme =~ /postgres/i
           @client = PG.connect(connect_url)
-          @client.exec "SET search_path TO %s" % [ options.fetch(:schema) ] unless options.fetch(:schema).empty?
+          @client.exec "SET search_path TO %s" % [ options[:schema] ] if options[:schema]
         else
           raise 'No Imp!'
         end

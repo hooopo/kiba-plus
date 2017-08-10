@@ -9,12 +9,11 @@ module Kiba::Plus::Destination
       @options.assert_valid_keys(
         :connect_url,
         :schema,
-        :prepare_name,
-        :prepare_sql,
+        :table_name,
         :columns
       )
       @conn = PG.connect(connect_url)
-      @conn.exec "SET search_path TO %s" % [ options.fetch(:schema) ] unless options.fetch(:schema).empty?
+      @conn.exec "SET search_path TO %s" % [ options[:schema] ] if options[:schema]
       init
     end
 
@@ -43,12 +42,18 @@ module Kiba::Plus::Destination
       options.fetch(:connect_url)
     end
 
+    def table_name
+      options.fetch(:table_name)
+    end
+
     def prepare_name
-      options.fetch(:prepare_name, self.class.to_s.downcase + "stmt")
+      options.fetch(:prepare_name, table_name + "_stmt")
     end
 
     def prepare_sql
-      options.fetch(:prepare_sql)
+      sql = <<-SQL
+        INSERT INTO #{table_name} (#{columns.join(', ') }) VALUES (#{columns.each_with_index.map { |_, i| "$#{i + 1}" }.join(', ')});
+      SQL
     end
 
     def columns

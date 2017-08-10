@@ -24,9 +24,8 @@ class Kiba::Plus::Destination::PgTest < Minitest::Test
   def setup
     @options = {
       connect_url: @@connect_urls[:pg_dest],
-      prepare_name: 'statement',
-      prepare_sql: 'INSERT INTO customers VALUES ($1, $2, $3, $4)',
-      columns: [:id, :email, :first_name, :last_name]
+      columns: [:id, :email, :first_name, :last_name],
+      table_name: 'customers'
     }
 
     @obj = Kiba::Plus::Destination::Pg.new(@options)
@@ -73,20 +72,6 @@ class Kiba::Plus::Destination::PgTest < Minitest::Test
     assert_raises (KeyError) { @obj.send(:connect_url) }
   end
 
-  def test_prepare_name
-    @obj.options.delete :prepare_name
-    assert_equal 'kiba::plus::destination::pgstmt', @obj.send(:prepare_name)
-
-    @obj.options[:prepare_name] = 'statement'
-    assert_equal 'statement', @obj.send(:prepare_name)
-  end
-
-  def test_prepare_sql
-    assert_equal 'INSERT INTO customers VALUES ($1, $2, $3, $4)', @obj.send(:prepare_sql)
-
-    @obj.options.delete :prepare_sql
-    assert_raises (KeyError) { @obj.send(:prepare_sql) }
-  end
 
   def test_columns
     assert_equal [:id, :email, :first_name, :last_name], @obj.send(:columns)

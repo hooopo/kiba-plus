@@ -46,22 +46,4 @@ class Kiba::Plus::Source::MysqlTest < Minitest::Test
     @obj.options.delete :query
     assert_raises (KeyError) { @obj.send(:query) }
   end
-
-  def test_incremental
-    @obj.options.delete :incremental
-    assert_equal true, @obj.send(:incremental)
-
-    @obj.options[:incremental] = false
-    assert_equal false, @obj.send(:incremental)
-  end
-
-  def test_last_pull_at
-    @obj.options.delete :last_pull_at
-    assert_equal nil, @obj.send(:last_pull_at)
-
-    now = Time.now.to_i
-    @obj.options[:last_pull_at] = now
-    assert_equal now, @obj.send(:last_pull_at)
-  end
-
 end
