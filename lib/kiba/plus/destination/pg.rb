@@ -8,11 +8,13 @@ module Kiba::Plus::Destination
       @options = options
       @options.assert_valid_keys(
         :connect_url,
+        :schema,
         :prepare_name,
         :prepare_sql,
         :columns
       )
       @conn = PG.connect(connect_url)
+      @conn.exec "SET search_path TO %s" % [ options.fetch(:schema) ] unless options.fetch(:schema).empty?
       init
     end
 

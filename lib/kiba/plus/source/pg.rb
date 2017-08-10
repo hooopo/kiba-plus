@@ -1,9 +1,9 @@
-require 'mysql2'
+require 'pg'
 require 'uri'
 
 module Kiba
   module Plus::Source
-    class Mysql
+    class Pg
       include Kiba::Plus::Helper
       attr_reader :options, :client
 
@@ -11,14 +11,16 @@ module Kiba
         @options = options
         @options.assert_valid_keys(
           :connect_url,
+          :schema,
           :query
         )
-        @client = Mysql2::Client.new(mysql2_connect_hash(connect_url))
+        @client = PG.connect(connect_url)
+        @client.exec "SET search_path TO %s" % [ options.fetch(:schema) ] unless options.fetch(:schema).empty?
       end
 
       def each
         Kiba::Plus.logger.info query
-        results = client.query(query, as: :hash, symbolize_keys: true, stream: true)
+        results = client.query(query)
         results.each do |row|
           yield(row)
         end
