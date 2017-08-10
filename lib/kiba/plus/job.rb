@@ -12,12 +12,13 @@ module Kiba
       attr_reader :options, :client
       def initialize(options)
         @options = options
-        @options.assert_valid_keys(:connect_url, :job_id, :job_name, :start_at, :completed_at)
+        @options.assert_valid_keys(:connect_url, :job_id, :job_name, :start_at, :completed_at, :schema)
         url = URI.parse(connect_url)
         if url.scheme =~ /mysql/i
           @client = Mysql2::Client.new(mysql2_connect_hash(connect_url))
         elsif url.scheme =~ /postgres/i
           @client = PG.connect(connect_url)
+          @client.exec "SET search_path TO %s" % [ options.fetch(:schema) ] unless options.fetch(:schema).empty?
         else
           raise 'No Imp!'
         end
