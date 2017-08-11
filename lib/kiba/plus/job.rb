@@ -12,7 +12,7 @@ module Kiba
       attr_reader :options, :client
       def initialize(options)
         @options = options
-        @options.assert_valid_keys(:connect_url, :job_id, :job_name, :start_at, :completed_at, :schema)
+        @options.assert_valid_keys(:connect_url, :job_id, :job_name, :start_at, :completed_at, :schema, :job_table_name)
         url = URI.parse(connect_url)
         if url.scheme =~ /mysql/i
           @client = Mysql2::Client.new(mysql2_connect_hash(connect_url))
@@ -36,6 +36,10 @@ module Kiba
         options.fetch(:job_name)
       end
 
+      def job_table_name
+        options.fetch(:job_table_name, "etl_jobs")
+      end
+
       def start_at
         options.fetch(:start_at, Time.now)
       end
@@ -51,7 +55,7 @@ module Kiba
       end
 
       def last_pull_at
-        sql = "SELECT MAX(created_at) AS last_pull_at FROM jobs WHERE status = 'completed' AND job_name = '#{job_name}'"
+        sql = "SELECT MAX(created_at) AS last_pull_at FROM #{job_table_name} WHERE status = 'completed' AND job_name = '#{job_name}'"
         Kiba::Plus.logger.info sql
         client.query(sql).first["last_pull_at"]
       end
@@ -83,7 +87,7 @@ module Kiba
 
       def create_job_mysql
         sql = <<-SQL
-          INSERT INTO jobs (
+          INSERT INTO #{job_table_name} (
             completed_at,
             job_name,
             created_at,
@@ -99,7 +103,7 @@ module Kiba
 
       def create_job_pg
         sql = <<-SQL
-          INSERT INTO jobs (
+          INSERT INTO #{job_table_name} (
             completed_at,
             job_name,
             created_at,
@@ -112,7 +116,7 @@ module Kiba
 
       def create_table_pg
         sql = <<-SQL
-        CREATE TABLE IF NOT EXISTS jobs (
+        CREATE TABLE IF NOT EXISTS #{job_table_name} (
           id SERIAL,
           job_name varchar(255) NOT NULL,
           created_at TIMESTAMP without time zone,
@@ -127,7 +131,7 @@ module Kiba
 
       def create_table_mysql
         sql = <<-SQL
-        CREATE TABLE IF NOT EXISTS jobs (
+        CREATE TABLE IF NOT EXISTS #{job_table_name} (
           id integer(11) NOT NULL AUTO_INCREMENT,
           job_name varchar(255) NOT NULL,
           created_at datetime NOT NULL,
@@ -141,7 +145,7 @@ module Kiba
       end
 
       def complete_job
-        sql = "UPDATE jobs SET status = 'completed', completed_at = '#{completed_at.to_s}' WHERE id = #{job_id} AND job_name = '#{job_name}'"
+        sql = "UPDATE #{job_table_name} SET status = 'completed', completed_at = '#{completed_at.to_s}' WHERE id = #{job_id} AND job_name = '#{job_name}'"
         Kiba::Plus.logger.info sql
         @client.query(sql)
       end
