@@ -2,7 +2,6 @@ begin
   require 'mysql2'
 rescue LoadError
   puts 'gem mysql2 first!'
-  exit
 end
 require 'uri'
 
