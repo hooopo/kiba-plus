@@ -22,7 +22,7 @@ module Kiba
 
       def each
         Kiba::Plus.logger.info query
-        results = client.query(query, as: :hash, symbolize_keys: true, stream: true)
+        results = client.query(query, as: :hash, symbolize_keys: true, stream: true, cache_rows: false)
         results.each do |row|
           yield(row)
         end
