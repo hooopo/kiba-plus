@@ -1,8 +1,20 @@
 require 'uri'
 
 module Kiba
-  require 'pg'
-  require 'mysql2'
+  begin
+   require 'pg'
+  rescue LoadError
+    puts 'gem pg first!'
+    exit
+  end
+
+  begin
+    require 'mysql2'
+  rescue LoadError
+    puts 'gem mysql2 first!'
+    exit
+  end
+
   require 'uri'
 
   module Plus

@@ -1,4 +1,9 @@
-require 'pg'
+begin
+  require 'pg'
+rescue LoadError
+  puts 'gem pg first!'
+  exit
+end
 
 module Kiba::Plus::Destination
   class Pg

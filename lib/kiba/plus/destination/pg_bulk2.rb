@@ -1,4 +1,9 @@
-require 'pg'
+begin
+  require 'pg'
+rescue LoadError
+  puts 'gem pg first!'
+  exit
+end
 require 'csv'
 require_relative 'pg_bulk_utils'
 module Kiba::Plus::Destination

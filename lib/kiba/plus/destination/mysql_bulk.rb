@@ -1,4 +1,9 @@
-require 'mysql2'
+begin
+  require 'mysql2'
+rescue LoadError
+  puts 'gem mysql2 first!'
+  exit
+end
 
 module Kiba::Plus::Destination
   class MysqlBulk
