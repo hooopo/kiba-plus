@@ -76,7 +76,7 @@ module Kiba
       end
 
       def create_job
-        if @client.is_a?(Mysql2::Client)
+        if defined?(Mysql2::Client) && @client.is_a?(Mysql2::Client)
           create_job_mysql
         else
           create_job_pg
