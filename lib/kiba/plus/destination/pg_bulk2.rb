@@ -11,6 +11,7 @@ module Kiba::Plus::Destination
       @options = options
       @options.assert_valid_keys(
         :connect_url,
+        :schema,
         :table_name,
         :columns,
         :truncate,
@@ -19,7 +20,7 @@ module Kiba::Plus::Destination
       )
 
       @conn = PG.connect(connect_url)
-
+      @conn.exec "SET search_path TO %s" % [ options[:schema] ] if options[:schema]
       init
     end
 
