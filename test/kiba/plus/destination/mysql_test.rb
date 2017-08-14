@@ -1,5 +1,7 @@
 require 'test_helper'
 
+require "kiba/plus/destination/mysql"
+
 class Kiba::Plus::Destination::MysqlTest < Minitest::Test
   def before_setup
     super

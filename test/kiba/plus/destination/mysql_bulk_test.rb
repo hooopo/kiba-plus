@@ -1,5 +1,7 @@
 require 'test_helper'
 
+require "kiba/plus/destination/mysql_bulk"
+
 class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
 
   def setup

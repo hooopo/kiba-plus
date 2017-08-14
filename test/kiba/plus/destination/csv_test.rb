@@ -1,5 +1,7 @@
 require 'test_helper'
 
+require "kiba/plus/destination/csv"
+
 class Kiba::Plus::Destination::CsvTest < Minitest::Test
 
   def setup

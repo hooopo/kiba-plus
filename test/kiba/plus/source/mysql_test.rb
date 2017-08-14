@@ -1,4 +1,5 @@
 require 'test_helper'
+require "kiba/plus/source/mysql"
 
 class Kiba::Plus::Source::MysqlTest < Minitest::Test
 

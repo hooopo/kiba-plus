@@ -1,5 +1,7 @@
 require 'test_helper'
 
+require "kiba/plus/destination/pg_bulk"
+
 class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
 
   def before_setup
