@@ -64,7 +64,7 @@ class Kiba::Plus::Destination::PgTest < Minitest::Test
 
   def test_close
     @obj.close
-    assert_equal nil, @obj.conn
+    assert_nil @obj.conn
   end
 
   def test_connect_url

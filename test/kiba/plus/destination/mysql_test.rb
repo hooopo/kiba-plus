@@ -44,7 +44,7 @@ class Kiba::Plus::Destination::MysqlTest < Minitest::Test
     row = {id: 1, email: "user1@example.com", first_name: 'foo', last_name: 'bar'}
     result = @obj.write(row)
 
-    assert_equal nil, result
+    assert_nil result
 
     assert_equal 1, @dest_mysql2_db[:customers].count
     assert_equal 'user1@example.com', @dest_mysql2_db[:customers].order(:id).last[:email]
@@ -61,7 +61,7 @@ class Kiba::Plus::Destination::MysqlTest < Minitest::Test
 
   def test_close
     @obj.close
-    assert_equal nil, @obj.client
+    assert_nil @obj.client
   end
 
   def test_connect_url

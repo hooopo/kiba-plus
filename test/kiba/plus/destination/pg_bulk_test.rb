@@ -37,7 +37,7 @@ class Kiba::Plus::Destination::PgBulkTest < Minitest::Test
   end
 
   def test_write
-    assert_equal nil, @obj.write([])
+    assert_nil @obj.write([])
   end
 
   def test_close
