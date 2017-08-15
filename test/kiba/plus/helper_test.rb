@@ -44,12 +44,10 @@ class Kiba::Plus::HelperTest < Minitest::Test
   end
 
   def test_scheme_with_invalid_url
-    expected = nil
-
     url = 'example.com'
     result = scheme(url)
 
-    assert_equal expected, result
+    assert_nil result
   end
 
   def test_format_sql

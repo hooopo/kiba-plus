@@ -21,7 +21,7 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
   end
 
   def test_write
-    assert_equal nil, @obj.write([])
+    assert_nil @obj.write([])
   end
 
   def test_close_when_truncate
@@ -29,7 +29,7 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
       @obj.stub :truncate_sql, 'select now()' do
         @obj.stub :bulk_sql, 'select now()' do
           @obj.close
-          assert_equal nil, @obj.client
+          assert_nil @obj.client
         end
       end
     end
@@ -39,7 +39,7 @@ class Kiba::Plus::Destination::MysqlBulkTest < Minitest::Test
     @obj.stub :truncate, false do
       @obj.stub :bulk_sql, 'select now()' do
         @obj.close
-        assert_equal nil, @obj.client
+        assert_nil @obj.client
       end
     end
   end
