@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 require_relative 'init'
 
+require 'kiba/plus/source/mysql'
+require 'kiba/plus/destination/csv'
+
 SOURCE_URL = 'mysql://root@localhost/shopperplus'
 
 source Kiba::Plus::Source::Mysql, :connect_url => SOURCE_URL,

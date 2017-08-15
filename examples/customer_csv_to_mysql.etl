@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require_relative 'init'
 
+require 'kiba/plus/destination/mysql_bulk'
+
 DEST_URL   = 'mysql://root@localhost/crm2_dev'
 
 destination Kiba::Plus::Destination::MysqlBulk, { :connect_url => DEST_URL,
