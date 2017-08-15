@@ -25,9 +25,9 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
     end
   end
 
-  def test_truncate_staging_table
-    @obj.stub :truncate_staging_table_sql, 'select now()' do
-      assert_instance_of PG::Result, @obj.send(:truncate_staging_table)
+  def test_drop_staging_table
+    @obj.stub :drop_staging_table_sql, 'select now()' do
+      assert_instance_of PG::Result, @obj.send(:drop_staging_table)
     end
   end
 
@@ -65,13 +65,13 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
     end
   end
 
-  def test_truncate_staging_table_sql
+  def test_drop_staging_table_sql
     expected_sql = <<-SQL
-    TRUNCATE TABLE customers_staging
+    DROP TABLE IF EXISTS customers_staging
     SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do
-      sql = @obj.send(:truncate_staging_table_sql)
+      sql = @obj.send(:drop_staging_table_sql)
 
       assert_equal wrap_sql(expected_sql), wrap_sql(sql)
     end

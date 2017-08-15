@@ -46,7 +46,7 @@ module Kiba::Plus::Destination
       if incremental
         delete_before_insert
         merge_to_target_table
-        truncate_staging_table
+        drop_staging_table
       end
     rescue
       raise
@@ -59,11 +59,11 @@ module Kiba::Plus::Destination
 
     def init
       if truncate
-        truncate_staging_table
+        drop_staging_table
         truncate_target_table
       end
       if incremental
-        truncate_staging_table
+        drop_staging_table
         create_staging_table
         sql = bulk_sql_with_incremental
       else

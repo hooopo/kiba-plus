@@ -29,12 +29,12 @@ module Kiba::Plus::Destination
 
     def close
       if incremental
-        truncate_staging_table
+        drop_staging_table
         create_staging_table
         copy_to_staging_table
         delete_before_insert
         merge_to_target_table
-        truncate_staging_table
+        drop_staging_table
       else
         copy_to_target_table
       end
@@ -46,7 +46,7 @@ module Kiba::Plus::Destination
 
     def init
       if truncate
-        truncate_staging_table
+        drop_staging_table
         truncate_target_table
       end
     end

@@ -22,14 +22,14 @@ module Kiba::Plus::Destination
       format_sql sql
     end
 
-    def truncate_staging_table
-      sql = truncate_staging_table_sql
+    def drop_staging_table
+      sql = drop_staging_table_sql
       Kiba::Plus.logger.info sql
       @conn.exec(sql) rescue nil
     end
 
-    def truncate_staging_table_sql
-      sql = "TRUNCATE TABLE #{staging_table_name}"
+    def drop_staging_table_sql
+      sql = "DROP TABLE IF EXISTS #{staging_table_name}"
       format_sql sql
     end
 
