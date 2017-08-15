@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require_relative 'init'
 
+require 'kiba/plus/destination/pg_bulk'
+
 DEST_URL   = 'postgresql://hooopo@localhost:5432/crm2_dev'
 
 destination Kiba::Plus::Destination::PgBulk, { :connect_url => DEST_URL,

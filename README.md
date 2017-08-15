@@ -8,6 +8,9 @@ Kiba enhancement for Ruby ETL. It connects to various data sources including rel
 
 require 'kiba/plus'
 
+require 'kiba/plus/source/mysql'
+require 'kiba/plus/destination/pg_bulk2'
+
 SOURCE_URL = 'mysql://root@localhost/shopperplus'
 
 DEST_URL   = 'postgresql://hooopo@localhost:5432/crm2_dev'
