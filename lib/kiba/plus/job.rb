@@ -90,7 +90,7 @@ module Kiba
             job_name,
             created_at,
             status) VALUES
-            (NULL, '#{job_name}', '#{start_at.to_s}', 'executing')
+            (NULL, '#{job_name}', '#{start_at.utc.strftime("%Y-%m-%dT%H:%M:%S.%L")}', 'executing')
         SQL
         Kiba::Plus.logger.info sql
         @client.query(sql)
@@ -106,7 +106,7 @@ module Kiba
             job_name,
             created_at,
             status) VALUES
-            (NULL, '#{job_name}', '#{start_at.to_s}', 'executing') RETURNING id
+            (NULL, '#{job_name}', '#{start_at.utc.strftime("%Y-%m-%dT%H:%M:%S.%L")}', 'executing') RETURNING id
         SQL
         Kiba::Plus.logger.info sql
         @client.query(sql)
@@ -143,7 +143,7 @@ module Kiba
       end
 
       def complete_job
-        sql = "UPDATE #{job_table_name} SET status = 'completed', completed_at = '#{completed_at.to_s}' WHERE id = #{job_id} AND job_name = '#{job_name}'"
+        sql = %Q/UPDATE #{job_table_name} SET status = 'completed', completed_at = '#{completed_at.utc.strftime("%Y-%m-%dT%H:%M:%S.%L")}' WHERE id = #{job_id} AND job_name = '#{job_name}'/
         Kiba::Plus.logger.info sql
         @client.query(sql)
       end
