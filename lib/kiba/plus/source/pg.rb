@@ -17,7 +17,8 @@ module Kiba
         @options.assert_valid_keys(
           :connect_url,
           :schema,
-          :query
+          :query,
+          :stream
         )
         @client = PG.connect(connect_url)
         @client.exec "SET search_path TO %s" % [ options[:schema] ] if options[:schema]
@@ -25,9 +26,22 @@ module Kiba
 
       def each
         Kiba::Plus.logger.info query
-        results = client.query(query)
-        results.each do |row|
-          yield(row)
+        if stream
+          # http://www.rubydoc.info/github/ged/ruby-pg/PG%2FConnection%3Aset_single_row_mode
+          client.send_query(query)
+          client.set_single_row_mode
+          loop do
+            res = client.get_result or break
+            res.check
+            res.each do |row|
+              yield(row)
+            end
+          end
+        else
+          results = client.query(query)
+          results.each do |row|
+            yield(row)
+          end
         end
       end
 
@@ -39,6 +53,10 @@ module Kiba
 
       def query
         options.fetch(:query)
+      end
+
+      def stream
+        options.fetch(:stream, false)
       end
     end
   end
