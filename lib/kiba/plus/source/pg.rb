@@ -18,7 +18,8 @@ module Kiba
           :connect_url,
           :schema,
           :query,
-          :stream
+          :stream,
+          :process_bar
         )
         @client = PG.connect(connect_url)
         @client.exec "SET search_path TO %s" % [ options[:schema] ] if options[:schema]
@@ -26,7 +27,7 @@ module Kiba
 
       def each
         Kiba::Plus.logger.info query
-        if stream
+        if stream?
           # http://www.rubydoc.info/github/ged/ruby-pg/PG%2FConnection%3Aset_single_row_mode
           client.send_query(query)
           client.set_single_row_mode
@@ -34,12 +35,14 @@ module Kiba
             res = client.get_result or break
             res.check
             res.each do |row|
+              print_process_bar if process_bar?
               yield(row)
             end
           end
         else
           results = client.query(query)
           results.each do |row|
+            print_process_bar if process_bar?
             yield(row)
           end
         end
@@ -55,8 +58,20 @@ module Kiba
         options.fetch(:query)
       end
 
-      def stream
+      def stream?
         options.fetch(:stream, false)
+      end
+
+      def process_bar?
+        options.fetch(:process_bar, true)
+      end
+
+      def print_process_bar
+        @num ||= 1
+        $stdout.print "." * @num
+        $stdout.print "\r"
+        $stdout.flush
+        @num = @num + 1
       end
     end
   end
