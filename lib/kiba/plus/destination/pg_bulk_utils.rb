@@ -15,7 +15,7 @@ module Kiba::Plus::Destination
 
     def create_staging_table_sql
       sql = <<-SQL
-      CREATE TABLE IF NOT EXISTS #{staging_table_name} (
+      CREATE UNLOGGED TABLE IF NOT EXISTS #{staging_table_name} (
         LIKE #{table_name} INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES
       )
       SQL
