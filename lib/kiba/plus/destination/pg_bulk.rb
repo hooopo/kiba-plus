@@ -32,7 +32,7 @@ module Kiba::Plus::Destination
         drop_staging_table
         create_staging_table
         copy_to_staging_table
-        delete_before_insert
+        #delete_before_insert
         merge_to_target_table
         drop_staging_table
       else
