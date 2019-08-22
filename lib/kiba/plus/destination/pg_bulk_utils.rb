@@ -17,7 +17,7 @@ module Kiba::Plus::Destination
       sql = <<-SQL
       CREATE UNLOGGED TABLE IF NOT EXISTS #{staging_table_name} (
         LIKE #{table_name} INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES
-      )
+      ) WITH (autovacuum_enabled = off)
       SQL
       format_sql sql
     end
