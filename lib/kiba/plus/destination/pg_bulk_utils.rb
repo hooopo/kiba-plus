@@ -68,7 +68,7 @@ module Kiba::Plus::Destination
       sets = columns.map{|x| "#{x} = excluded.#{x}" }.join(', ')
       sql = <<~SQL
         INSERT INTO #{table_name} (SELECT * FROM #{staging_table_name})
-        ON CONFLICT (#{unique_by.join(", ")})
+        ON CONFLICT (#{Array(unique_by).join(", ")})
         DO UPDATE SET #{sets}
       SQL
       format_sql sql

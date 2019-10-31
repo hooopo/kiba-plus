@@ -51,9 +51,9 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
 
   def test_create_staging_table_sql
     expected_sql = <<-SQL
-    CREATE TABLE IF NOT EXISTS customers_staging (
+    CREATE UNLOGGED TABLE IF NOT EXISTS customers_staging (
       LIKE customers INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES
-    )
+    ) WITH (autovacuum_enabled = off)
     SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do
@@ -111,6 +111,8 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
     expected_sql = <<-SQL
     INSERT INTO customers
       (SELECT * FROM customers_staging)
+    ON CONFLICT (id)
+    DO UPDATE SET id = excluded.id, email = excluded.email, first_name = excluded.first_name, last_name = excluded.last_name
     SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do
