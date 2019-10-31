@@ -37,12 +37,6 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
     end
   end
 
-  def test_delete_before_insert
-    @obj.stub :delete_before_insert_sql, 'select now()' do
-      assert_instance_of PG::Result, @obj.send(:delete_before_insert)
-    end
-  end
-
   def test_merge_to_target_table
     @obj.stub :merge_to_target_table_sql, 'select now()' do
       assert_instance_of PG::Result, @obj.send(:merge_to_target_table)
@@ -51,9 +45,9 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
 
   def test_create_staging_table_sql
     expected_sql = <<-SQL
-    CREATE TABLE IF NOT EXISTS customers_staging (
+    CREATE UNLOGGED TABLE IF NOT EXISTS customers_staging (
       LIKE customers INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES
-    )
+    ) WITH (autovacuum_enabled = off)
     SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do
@@ -89,28 +83,12 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
     end
   end
 
-  def test_delete_before_insert_sql
-    expected_sql = <<-SQL
-    DELETE FROM customers
-      USING customers_staging
-      WHERE customers_staging.id = customers.id
-    SQL
-
-    @obj.stub :staging_table_name, 'customers_staging' do
-      @obj.stub :table_name, 'customers' do
-        @obj.stub :unique_by, :id do
-          sql = @obj.send(:delete_before_insert_sql)
-
-          assert_equal wrap_sql(expected_sql), wrap_sql(sql)
-        end
-      end
-    end
-  end
-
   def test_merge_to_target_table_sql
     expected_sql = <<-SQL
     INSERT INTO customers
       (SELECT * FROM customers_staging)
+    ON CONFLICT (id)
+    DO UPDATE SET id = excluded.id, email = excluded.email, first_name = excluded.first_name, last_name = excluded.last_name
     SQL
 
     @obj.stub :staging_table_name, 'customers_staging' do

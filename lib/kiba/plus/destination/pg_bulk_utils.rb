@@ -44,20 +44,6 @@ module Kiba::Plus::Destination
       format_sql sql
     end
     
-    # TODO remove it
-    def delete_before_insert
-      sql = delete_before_insert_sql
-      Kiba::Plus.logger.info sql
-      @conn.exec(sql)
-    end
-
-    # TODO remove it
-    def delete_before_insert_sql
-      where = Array(unique_by).map{|x| ["#{staging_table_name}.#{x}", "#{table_name}.#{x}"].join(" = ") }.join(" AND ")
-      sql = "DELETE FROM #{table_name} USING #{staging_table_name} WHERE #{where}"
-      format_sql sql
-    end
-
     def merge_to_target_table
       sql = merge_to_target_table_sql
       Kiba::Plus.logger.info sql
@@ -68,7 +54,7 @@ module Kiba::Plus::Destination
       sets = columns.map{|x| "#{x} = excluded.#{x}" }.join(', ')
       sql = <<~SQL
         INSERT INTO #{table_name} (SELECT * FROM #{staging_table_name})
-        ON CONFLICT (#{unique_by.join(", ")})
+        ON CONFLICT (#{Array(unique_by).join(", ")})
         DO UPDATE SET #{sets}
       SQL
       format_sql sql

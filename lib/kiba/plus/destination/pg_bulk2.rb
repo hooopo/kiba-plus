@@ -44,7 +44,6 @@ module Kiba::Plus::Destination
       @conn.put_copy_end
       @conn.get_last_result
       if incremental
-        #delete_before_insert
         merge_to_target_table
         drop_staging_table
       end
