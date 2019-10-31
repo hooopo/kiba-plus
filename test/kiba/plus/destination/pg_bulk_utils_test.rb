@@ -37,12 +37,6 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
     end
   end
 
-  def test_delete_before_insert
-    @obj.stub :delete_before_insert_sql, 'select now()' do
-      assert_instance_of PG::Result, @obj.send(:delete_before_insert)
-    end
-  end
-
   def test_merge_to_target_table
     @obj.stub :merge_to_target_table_sql, 'select now()' do
       assert_instance_of PG::Result, @obj.send(:merge_to_target_table)
@@ -86,24 +80,6 @@ class Kiba::Plus::Destination::PgBulkUtilsTest < Minitest::Test
       sql = @obj.send(:truncate_target_table_sql)
 
       assert_equal wrap_sql(expected_sql), wrap_sql(sql)
-    end
-  end
-
-  def test_delete_before_insert_sql
-    expected_sql = <<-SQL
-    DELETE FROM customers
-      USING customers_staging
-      WHERE customers_staging.id = customers.id
-    SQL
-
-    @obj.stub :staging_table_name, 'customers_staging' do
-      @obj.stub :table_name, 'customers' do
-        @obj.stub :unique_by, :id do
-          sql = @obj.send(:delete_before_insert_sql)
-
-          assert_equal wrap_sql(expected_sql), wrap_sql(sql)
-        end
-      end
     end
   end
 
